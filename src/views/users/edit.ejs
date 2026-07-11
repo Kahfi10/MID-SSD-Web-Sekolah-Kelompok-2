@@ -1,0 +1,40 @@
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-header bg-white rounded-4 rounded-bottom-0 py-3">
+                <h5 class="mb-0"><i class="bi bi-pencil"></i> Edit Pengguna</h5>
+            </div>
+            <div class="card-body">
+                <form action="/users/update/<%= user.id %>" method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Nama Lengkap</label>
+                        <input type="text" name="full_name" class="form-control" value="<%= user.full_name %>" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" name="email" class="form-control" value="<%= user.email %>" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Role</label>
+                        <select name="role_id" class="form-control" required>
+                            <% roles.forEach(function(r) { %>
+                            <option value="<%= r.id %>" <%= user.role_id === r.id ? 'selected' : '' %>><%= r.name %></option>
+                            <% }); %>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Status</label>
+                        <select name="is_active" class="form-control">
+                            <option value="1" <%= user.is_active == 1 ? 'selected' : '' %>>Aktif</option>
+                            <option value="0" <%= user.is_active == 0 ? 'selected' : '' %>>Nonaktif</option>
+                        </select>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <a href="/users" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Kembali</a>
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i> Simpan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

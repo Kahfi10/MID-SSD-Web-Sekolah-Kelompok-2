@@ -1,0 +1,230 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4><i class="bi bi-heart-pulse-fill"></i> Bimbingan Konseling</h4>
+    <div>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCase"><i class="bi bi-plus-lg"></i> Kasus</button>
+        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalCounseling"><i class="bi bi-plus-lg"></i> Konseling</button>
+        <button class="btn btn-warning text-white" data-bs-toggle="modal" data-bs-target="#modalViolation"><i class="bi bi-plus-lg"></i> Pelanggaran</button>
+        <button class="btn btn-info text-white" data-bs-toggle="modal" data-bs-target="#modalAchievement"><i class="bi bi-plus-lg"></i> Prestasi</button>
+    </div>
+</div>
+
+<!-- Kasus -->
+<div class="card border-0 shadow-sm rounded-4 mb-3">
+    <div class="card-header bg-white rounded-4 rounded-bottom-0 py-3">
+        <h5 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Daftar Kasus</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Siswa</th><th>NIS</th><th>Kelas</th><th>Tgl</th><th>Jenis</th><th>Deskripsi</th><th>Status</th><th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% cases.forEach(function(c) { %>
+                    <tr>
+                        <td><%= c.student_name %></td>
+                        <td><%= c.nis %></td>
+                        <td><%= c.class_name || '-' %></td>
+                        <td><%= c.case_date %></td>
+                        <td><%= c.case_type %></td>
+                        <td><%= c.description %></td>
+                        <td>
+                            <% if (c.status === 'open') { %><span class="badge bg-danger">Open</span>
+                            <% } else if (c.status === 'proses') { %><span class="badge bg-warning">Proses</span>
+                            <% } else { %><span class="badge bg-success">Selesai</span><% } %>
+                        </td>
+                        <td>
+                            <form action="/bk/cases/update-status/<%= c.id %>" method="POST" class="d-inline">
+                                <select name="status" class="form-select form-select-sm d-inline w-auto" onchange="this.form.submit()">
+                                    <option value="open" <%= c.status === 'open' ? 'selected' : '' %>>Open</option>
+                                    <option value="proses" <%= c.status === 'proses' ? 'selected' : '' %>>Proses</option>
+                                    <option value="selesai" <%= c.status === 'selesai' ? 'selected' : '' %>>Selesai</option>
+                                </select>
+                            </form>
+                        </td>
+                    </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Konseling -->
+<div class="card border-0 shadow-sm rounded-4 mb-3">
+    <div class="card-header bg-white rounded-4 rounded-bottom-0 py-3">
+        <h5 class="mb-0"><i class="bi bi-chat-dots"></i> Catatan Konseling</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Siswa</th><th>NIS</th><th>Tanggal</th><th>Topik</th><th>Catatan</th><th>Tindak Lanjut</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% counseling.forEach(function(c) { %>
+                    <tr>
+                        <td><%= c.student_name %></td>
+                        <td><%= c.nis %></td>
+                        <td><%= c.counseling_date %></td>
+                        <td><%= c.topic %></td>
+                        <td><%= c.note %></td>
+                        <td><%= c.follow_up || '-' %></td>
+                    </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Pelanggaran -->
+<div class="card border-0 shadow-sm rounded-4 mb-3">
+    <div class="card-header bg-white rounded-4 rounded-bottom-0 py-3">
+        <h5 class="mb-0"><i class="bi bi-shield-exclamation"></i> Pelanggaran Siswa</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Siswa</th><th>NIS</th><th>Tanggal</th><th>Jenis</th><th>Deskripsi</th><th>Sanksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% violations.forEach(function(v) { %>
+                    <tr>
+                        <td><%= v.student_name %></td>
+                        <td><%= v.nis %></td>
+                        <td><%= v.violation_date %></td>
+                        <td><%= v.violation_type %></td>
+                        <td><%= v.description %></td>
+                        <td><%= v.sanction || '-' %></td>
+                    </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Prestasi -->
+<div class="card border-0 shadow-sm rounded-4 mb-3">
+    <div class="card-header bg-white rounded-4 rounded-bottom-0 py-3">
+        <h5 class="mb-0"><i class="bi bi-trophy"></i> Prestasi Siswa</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Siswa</th><th>NIS</th><th>Tanggal</th><th>Prestasi</th><th>Tingkat</th><th>Keterangan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% achievements.forEach(function(a) { %>
+                    <tr>
+                        <td><%= a.student_name %></td>
+                        <td><%= a.nis %></td>
+                        <td><%= a.achievement_date %></td>
+                        <td><%= a.achievement_name %></td>
+                        <td><%= a.level || '-' %></td>
+                        <td><%= a.description || '-' %></td>
+                    </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Kasus -->
+<div class="modal fade" id="modalCase" tabindex="-1"><div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header"><h5 class="modal-title">Catat Kasus Baru</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+    <form action="/bk/cases/store" method="POST"><div class="modal-body">
+        <div class="mb-3"><label class="form-label">Siswa</label>
+            <select name="student_id" class="form-control" required>
+                <option value="">-- Pilih Siswa --</option>
+                <% students.forEach(function(s) { %>
+                <option value="<%= s.id %>"><%= s.nis %> - <%= s.full_name %></option>
+                <% }); %>
+            </select>
+        </div>
+        <div class="mb-3"><label class="form-label">Tanggal</label><input type="date" name="case_date" class="form-control" required></div>
+        <div class="mb-3"><label class="form-label">Jenis Kasus</label><input type="text" name="case_type" class="form-control" required></div>
+        <div class="mb-3"><label class="form-label">Deskripsi</label><textarea name="description" class="form-control" rows="2" required></textarea></div>
+    </div><div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+        <button type="submit" class="btn btn-primary">Simpan</button>
+    </div></form>
+</div></div></div>
+
+<!-- Modal Konseling -->
+<div class="modal fade" id="modalCounseling" tabindex="-1"><div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header"><h5 class="modal-title">Catat Konseling</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+    <form action="/bk/counseling/store" method="POST"><div class="modal-body">
+        <div class="mb-3"><label class="form-label">Siswa</label>
+            <select name="student_id" class="form-control" required>
+                <option value="">-- Pilih Siswa --</option>
+                <% students.forEach(function(s) { %>
+                <option value="<%= s.id %>"><%= s.nis %> - <%= s.full_name %></option>
+                <% }); %>
+            </select>
+        </div>
+        <div class="mb-3"><label class="form-label">Tanggal</label><input type="date" name="counseling_date" class="form-control" required></div>
+        <div class="mb-3"><label class="form-label">Topik</label><input type="text" name="topic" class="form-control" required></div>
+        <div class="mb-3"><label class="form-label">Catatan</label><textarea name="note" class="form-control" rows="2" required></textarea></div>
+        <div class="mb-3"><label class="form-label">Tindak Lanjut</label><textarea name="follow_up" class="form-control" rows="2"></textarea></div>
+    </div><div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+        <button type="submit" class="btn btn-success">Simpan</button>
+    </div></form>
+</div></div></div>
+
+<!-- Modal Pelanggaran -->
+<div class="modal fade" id="modalViolation" tabindex="-1"><div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header"><h5 class="modal-title">Catat Pelanggaran</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+    <form action="/bk/violations/store" method="POST"><div class="modal-body">
+        <div class="mb-3"><label class="form-label">Siswa</label>
+            <select name="student_id" class="form-control" required>
+                <option value="">-- Pilih Siswa --</option>
+                <% students.forEach(function(s) { %>
+                <option value="<%= s.id %>"><%= s.nis %> - <%= s.full_name %></option>
+                <% }); %>
+            </select>
+        </div>
+        <div class="mb-3"><label class="form-label">Tanggal</label><input type="date" name="violation_date" class="form-control" required></div>
+        <div class="mb-3"><label class="form-label">Jenis Pelanggaran</label><input type="text" name="violation_type" class="form-control" required></div>
+        <div class="mb-3"><label class="form-label">Deskripsi</label><textarea name="description" class="form-control" rows="2" required></textarea></div>
+        <div class="mb-3"><label class="form-label">Sanksi</label><textarea name="sanction" class="form-control" rows="2"></textarea></div>
+    </div><div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+        <button type="submit" class="btn btn-warning text-white">Simpan</button>
+    </div></form>
+</div></div></div>
+
+<!-- Modal Prestasi -->
+<div class="modal fade" id="modalAchievement" tabindex="-1"><div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header"><h5 class="modal-title">Catat Prestasi</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+    <form action="/bk/achievements/store" method="POST"><div class="modal-body">
+        <div class="mb-3"><label class="form-label">Siswa</label>
+            <select name="student_id" class="form-control" required>
+                <option value="">-- Pilih Siswa --</option>
+                <% students.forEach(function(s) { %>
+                <option value="<%= s.id %>"><%= s.nis %> - <%= s.full_name %></option>
+                <% }); %>
+            </select>
+        </div>
+        <div class="mb-3"><label class="form-label">Nama Prestasi</label><input type="text" name="achievement_name" class="form-control" required></div>
+        <div class="mb-3"><label class="form-label">Tanggal</label><input type="date" name="achievement_date" class="form-control" required></div>
+        <div class="mb-3"><label class="form-label">Tingkat</label><input type="text" name="level" class="form-control" placeholder="Sekolah/Kota/Provinsi/Nasional"></div>
+        <div class="mb-3"><label class="form-label">Keterangan</label><textarea name="description" class="form-control" rows="2"></textarea></div>
+    </div><div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+        <button type="submit" class="btn btn-info text-white">Simpan</button>
+    </div></form>
+</div></div></div>

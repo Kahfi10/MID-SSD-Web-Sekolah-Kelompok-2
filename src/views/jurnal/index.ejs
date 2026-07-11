@@ -1,0 +1,115 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4><i class="bi bi-journal-bookmark-fill"></i> Jurnal Mengajar</h4>
+    <% if (['guru','admin'].includes(userRole)) { %>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalTambah">
+        <i class="bi bi-plus-lg"></i> Input Jurnal
+    </button>
+    <% } %>
+</div>
+
+<div class="card border-0 shadow-sm rounded-4">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Tanggal</th>
+                        <th>Guru</th>
+                        <th>Kelas</th>
+                        <th>Mapel</th>
+                        <th>Materi</th>
+                        <th>Metode</th>
+                        <th>Catatan</th>
+                        <% if (userRole === 'admin') { %><th>Aksi</th><% } %>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% journals.forEach(function(j) { %>
+                    <tr>
+                        <td><%= j.teaching_date %></td>
+                        <td><%= j.teacher_name %></td>
+                        <td><%= j.class_name %></td>
+                        <td><%= j.subject_name %></td>
+                        <td><%= j.material %></td>
+                        <td><%= j.method || '-' %></td>
+                        <td><%= j.notes || '-' %></td>
+                        <% if (userRole === 'admin') { %>
+                        <td>
+                            <form action="/jurnal/delete/<%= j.id %>" method="POST" class="d-inline" onsubmit="return confirm('Hapus jurnal ini?')">
+                                <button class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button>
+                            </form>
+                        </td>
+                        <% } %>
+                    </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Tambah Jurnal -->
+<div class="modal fade" id="modalTambah" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Input Jurnal Mengajar</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="/jurnal/store" method="POST">
+                <div class="modal-body">
+                    <% if (userRole === 'admin') { %>
+                    <div class="mb-3">
+                        <label class="form-label">Guru</label>
+                        <select name="teacher_id" class="form-control" required>
+                            <option value="">-- Pilih Guru --</option>
+                            <% teachers.forEach(function(t) { %>
+                            <option value="<%= t.id %>"><%= t.full_name %></option>
+                            <% }); %>
+                        </select>
+                    </div>
+                    <% } %>
+                    <div class="mb-3">
+                        <label class="form-label">Kelas</label>
+                        <select name="class_id" class="form-control" required>
+                            <option value="">-- Pilih Kelas --</option>
+                            <% classes.forEach(function(c) { %>
+                            <option value="<%= c.id %>"><%= c.grade_level %> - <%= c.class_name %></option>
+                            <% }); %>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Mata Pelajaran</label>
+                        <select name="subject_id" class="form-control" required>
+                            <option value="">-- Pilih Mapel --</option>
+                            <% subjects.forEach(function(s) { %>
+                            <option value="<%= s.id %>"><%= s.subject_name %></option>
+                            <% }); %>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Tanggal Mengajar</label>
+                        <input type="date" name="teaching_date" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Materi Pembelajaran</label>
+                        <textarea name="material" class="form-control" rows="2" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Metode Pembelajaran</label>
+                        <input type="text" name="method" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Catatan</label>
+                        <textarea name="notes" class="form-control" rows="2"></textarea>
+                    </div>
+                    <input type="hidden" name="semester_id" value="<%= semesters.length > 0 ? semesters[0].id : 1 %>">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="/dashboard">
+                <i class="bi bi-mortarboard-fill"></i> Web Sekolah
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <% if (user) { %>
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/dashboard"><i class="bi bi-speedometer2"></i> Dashboard</a>
+                    </li>
+                    <% if (user.role_name === 'admin') { %>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/users"><i class="bi bi-people-fill"></i> Pengguna</a>
+                    </li>
+                    <% } %>
+                    <% if (['admin','kepala_sekolah','wali_kelas'].includes(user.role_name)) { %>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/kesiswaan"><i class="bi bi-person-vcard-fill"></i> Kesiswaan</a>
+                    </li>
+                    <% } %>
+                    <% if (['guru','admin','kepala_sekolah','wali_kelas'].includes(user.role_name)) { %>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/jurnal"><i class="bi bi-journal-bookmark-fill"></i> Jurnal</a>
+                    </li>
+                    <% } %>
+                    <% if (['guru_bk','admin','kepala_sekolah'].includes(user.role_name)) { %>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/bk"><i class="bi bi-heart-pulse-fill"></i> BK</a>
+                    </li>
+                    <% } %>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle"></i> <%= user.full_name %>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><span class="dropdown-item-text text-muted"><%= user.role_name %></span></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/auth/logout"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                <% } %>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-3">
+        <% if (success_msg.length > 0) { %>
+            <% success_msg.forEach(function(msg) { %>
+                <div class="alert alert-success alert-dismissible fade show">
+                    <i class="bi bi-check-circle-fill"></i> <%= msg %>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            <% }); %>
+        <% } %>
+        <% if (error_msg.length > 0) { %>
+            <% error_msg.forEach(function(msg) { %>
+                <div class="alert alert-danger alert-dismissible fade show">
+                    <i class="bi bi-exclamation-triangle-fill"></i> <%= msg %>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            <% }); %>
+        <% } %>
+
+        <%- body %>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/script.js"></script>
+</body>
+</html>

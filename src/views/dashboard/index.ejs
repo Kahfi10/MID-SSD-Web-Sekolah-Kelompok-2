@@ -1,0 +1,124 @@
+<div class="row">
+    <div class="col-12">
+        <h4 class="mb-4"><i class="bi bi-speedometer2"></i> Dashboard</h4>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm bg-primary text-white rounded-4">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title">Siswa Aktif</h6>
+                        <h2 class="mb-0 fw-bold"><%= studentCount %></h2>
+                    </div>
+                    <i class="bi bi-people-fill" style="font-size: 2.5rem; opacity: 0.5;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm bg-success text-white rounded-4">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title">Guru</h6>
+                        <h2 class="mb-0 fw-bold"><%= teacherCount %></h2>
+                    </div>
+                    <i class="bi bi-person-video3" style="font-size: 2.5rem; opacity: 0.5;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm bg-warning text-white rounded-4">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title">Jurnal</h6>
+                        <h2 class="mb-0 fw-bold"><%= journalCount %></h2>
+                    </div>
+                    <i class="bi bi-journal-bookmark-fill" style="font-size: 2.5rem; opacity: 0.5;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm bg-danger text-white rounded-4">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title">Kasus BK Aktif</h6>
+                        <h2 class="mb-0 fw-bold"><%= bkCaseCount %></h2>
+                    </div>
+                    <i class="bi bi-exclamation-triangle-fill" style="font-size: 2.5rem; opacity: 0.5;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-header bg-white rounded-4 rounded-bottom-0 py-3">
+                <h5 class="mb-0"><i class="bi bi-activity-log"></i> Aktivitas Terbaru</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Aksi</th>
+                                <th>Keterangan</th>
+                                <th>Waktu</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% if (recentLogs.length > 0) { %>
+                                <% recentLogs.forEach(function(log) { %>
+                                <tr>
+                                    <td><%= log.full_name %></td>
+                                    <td><span class="badge bg-info"><%= log.action %></span></td>
+                                    <td><%= log.description %></td>
+                                    <td><small class="text-muted"><%= log.created_at %></small></td>
+                                </tr>
+                                <% }); %>
+                            <% } else { %>
+                                <tr><td colspan="4" class="text-center text-muted">Belum ada aktivitas</td></tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-header bg-white rounded-4 rounded-bottom-0 py-3">
+                <h5 class="mb-0"><i class="bi bi-info-circle"></i> Informasi</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">Selamat datang di sistem Web Sekolah Terintegrasi.</p>
+                <hr>
+                <p><strong>User:</strong> <%= user.full_name %></p>
+                <p><strong>Role:</strong> <span class="badge bg-primary"><%= user.role_name %></span></p>
+                <hr>
+                <h6>Akses Modul:</h6>
+                <ul class="list-unstyled">
+                    <% if (['admin','kepala_sekolah','wali_kelas'].includes(user.role_name)) { %>
+                    <li><i class="bi bi-check-circle text-success"></i> Data Kesiswaan</li>
+                    <% } %>
+                    <% if (['guru','admin','kepala_sekolah','wali_kelas'].includes(user.role_name)) { %>
+                    <li><i class="bi bi-check-circle text-success"></i> Jurnal Mengajar</li>
+                    <% } %>
+                    <% if (['guru_bk','admin','kepala_sekolah'].includes(user.role_name)) { %>
+                    <li><i class="bi bi-check-circle text-success"></i> Bimbingan Konseling</li>
+                    <% } %>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

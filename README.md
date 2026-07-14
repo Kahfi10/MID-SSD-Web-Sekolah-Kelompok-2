@@ -20,13 +20,13 @@ Mata Kuliah: RPL-A Scalable System Design
 
 ## Pembagian Tugas
 
-| Peran | Tugas | PIC |
-|-------|-------|-----|
-| System Analyst | Latar belakang, tujuan, analisis kebutuhan, alur sistem, use case | Ashabul Kahfi |
-| System Architect | Arsitektur sistem, pembagian vCPU, load balancing, API integration, scaling strategy, monitoring, logging | Marhepi Rahmadani |
-| Database Designer | Rancangan database, ERD, tabel, relasi, indeks, konsistensi data | Muh. Eka Andri Setiawan |
-| UI/UX & Documentation | Rancangan tampilan, diagram pendukung, dokumentasi, laporan | Afra Muawiya |
-| Security & Access Control | Role pengguna, pembatasan akses, audit log, autentikasi, mitigasi risiko | Alyah Saputri Bakri |
+| No | Nama | NIM | Peran | Tugas Pokok | Fitur Spesifik |
+|----|------|-----|-------|-------------|----------------|
+| 1 | Ashabul Kahfi | 105841108523 | System Analyst / Project Lead | Latar belakang, tujuan, analisis kebutuhan, alur sistem, use case | Modul Absensi (full CRUD), Rekap Jurnal Mengajar, Reset Password |
+| 2 | Marhepi Rahmadani | 105841109523 | System Architect | Arsitektur sistem, pembagian vCPU, load balancing, scaling strategy, monitoring, logging | Rekap BK (kasus, pelanggaran, prestasi per siswa/kelas) |
+| 3 | Muh. Eka Andri Setiawan | 105841110723 | Database Designer | Rancangan database, ERD, tabel, relasi, indeks, konsistensi data | Kelola Wali Kelas (assign wali ke kelas), schema 16 tabel |
+| 4 | Afra Muawiya | 105841108423 | UI/UX & Documentation | Rancangan tampilan, diagram pendukung, dokumentasi, laporan, video | Import CSV siswa, Apple monochrome theme CSS, README |
+| 5 | Alyah Saputri Bakri | 105841107723 | Security & Access Control | Role pengguna, pembatasan akses, audit log, autentikasi, mitigasi risiko | Export CSV siswa, middleware RBAC (allowRoles), audit log |
 
 ---
 

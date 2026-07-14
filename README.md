@@ -258,7 +258,7 @@ Server akan berjalan di `http://localhost:3000`.
 
 ## Link Demo Online
 
-Akses aplikasi: **https://kahfi.duckdns.org**
+Akses aplikasi: **https://web-sekolah.duckdns.org**
 
 ---
 

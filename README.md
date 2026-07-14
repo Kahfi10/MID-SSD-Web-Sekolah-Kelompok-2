@@ -1,4 +1,4 @@
-# MID-SSD-Web-Sekolah-Kelompok2
+# MID-SSD-Web-Sekolah-Kelompok-5
 
 **Web Sekolah Terintegrasi Berbasis Scalable System Design**
 

@@ -103,7 +103,7 @@ MID-SSD-Web-Sekolah-Kelompok2/
 
 ## Rancangan Arsitektur Sistem
 
-![Arsitektur Sistem](docs/arsitektur.png)
+![Arsitektur Sistem](docs/arsitektur.jpg)
 
 ### Deskripsi Arsitektur:
 - **Modular Monolith Architecture**: Sistem dibagi menjadi modul-modul terpisah (auth, users, kesiswaan, jurnal, bk, absensi) tetapi berjalan dalam satu aplikasi.
@@ -156,7 +156,7 @@ Database: `db_sekolah_ssd`
 - Semua modul berbagi data siswa, guru, kelas, dan mata pelajaran dari tabel yang sama.
 
 ### ERD:
-![ERD](docs/ERD.png)
+![ERD](docs/erd.jpeg)
 
 ---
 

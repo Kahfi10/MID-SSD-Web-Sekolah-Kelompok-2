@@ -2,21 +2,27 @@
     document.querySelectorAll('[data-search-suggest]').forEach(function (container) {
         var input = container.querySelector('input[type="text"]');
         var dropdown = container.querySelector('.search-suggest-dropdown');
+        var form = container.querySelector('form');
         var apiUrl = container.getAttribute('data-search-suggest');
         var timer = null;
 
         if (!input || !dropdown) return;
 
-        // Mencegah blur saat klik dropdown item
         dropdown.addEventListener('mousedown', function (e) {
             e.preventDefault();
         });
 
-        // Klik item navigasi
         dropdown.addEventListener('click', function (e) {
             var link = e.target.closest('a');
-            if (link && link.getAttribute('href') !== '#') {
-                window.location.href = link.getAttribute('href');
+            if (!link) return;
+            var href = link.getAttribute('href');
+            var label = link.getAttribute('data-label') || '';
+            if (href && href !== '#') {
+                window.location.href = href;
+            } else if (label) {
+                input.value = label;
+                dropdown.classList.add('d-none');
+                if (form) form.submit();
             }
         });
 
@@ -41,7 +47,7 @@
                             var label = item.full_name || item.student_name || item.username || '';
                             var sub = item.nis || item.email || item.role_name || item.class_name || '';
                             var href = item._href || '#';
-                            html += '<a href="' + href + '" class="list-group-item list-group-item-action px-3 py-2 border-0" style="background:#fff;color:#1d1d1f;">';
+                            html += '<a href="' + href + '" data-label="' + escapeHtml(label) + '" class="search-suggest-item">';
                             html += '<div style="font-size:0.9rem;font-weight:500;">' + highlight(label, val) + '</div>';
                             if (sub) html += '<div style="font-size:0.75rem;color:#86868b;">' + highlight(sub, val) + '</div>';
                             html += '</a>';

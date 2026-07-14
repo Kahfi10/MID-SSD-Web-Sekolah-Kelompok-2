@@ -350,3 +350,27 @@ canvas {
     h4 { font-size: 1rem; }
     #liveClock { font-size: 0.75rem !important; }
 }
+
+/* Search Suggest */
+.search-suggest-item {
+    display: block;
+    padding: 0.5rem 0.75rem;
+    color: #1d1d1f;
+    text-decoration: none;
+    background: #fff;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background 0.15s ease;
+}
+.search-suggest-item:last-child {
+    border-bottom: none;
+    border-radius: 0 0 0.5rem 0.5rem;
+}
+.search-suggest-item:first-child {
+    border-radius: 0.5rem 0.5rem 0 0;
+}
+.search-suggest-item:hover {
+    background: #f5f5f7;
+}
+.search-suggest-item strong {
+    color: #0071e3;
+}

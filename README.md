@@ -10,11 +10,11 @@ Mata Kuliah: RPL-A Scalable System Design
 
 | No | Nama | NIM | Peran |
 |----|------|-----|-------|
-| 1 | Ashabul Kahfi | - | System Analyst / Project Lead |
-| 2 | Marhepi Rahmadani | - | System Architect |
-| 3 | Muh. Eka Andri Setiawan | - | Database Designer |
-| 4 | Afra Muawiyah | - | UI/UX & Documentation Designer |
-| 5 | Alyah Saputri Bakri | - | Security & Access Control Designer |
+| 1 | Ashabul Kahfi | 105841108523 | System Analyst / Project Lead |
+| 2 | Marhepi Rahmadani | 105841109523 | System Architect |
+| 3 | Muh. Eka Andri Setiawan | 105841110723 | Database Designer |
+| 4 | Afra Muawiya | 105841108423 | UI/UX & Documentation Designer |
+| 5 | Alyah Saputri Bakri | 105841107723 | Security & Access Control Designer |
 
 ---
 

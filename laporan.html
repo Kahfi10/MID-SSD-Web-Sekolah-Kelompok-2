@@ -94,9 +94,32 @@
     <li>Membuat dokumentasi proyek yang sistematis dan mudah dipahami.</li>
     <li>Mengunggah source code ke GitHub dan membuat video presentasi di YouTube.</li>
   </ol>
+
+  <!-- ===== SYSTEM ANALYST: Analisis Kebutuhan ===== -->
+  <h2>6. Analisis Kebutuhan</h2>
+
+  <h3>6.1 Kebutuhan Fungsional</h3>
+  <table>
+    <tr><th>No</th><th>Modul</th><th>Kebutuhan Fungsional</th></tr>
+    <tr><td>1</td><td>Manajemen Pengguna</td><td>Login, logout, CRUD pengguna, manajemen role, reset password, audit log aktivitas</td></tr>
+    <tr><td>2</td><td>Data Kesiswaan</td><td>CRUD siswa, kelola kelas, kelola wali kelas, filter status siswa, import dan export data CSV</td></tr>
+    <tr><td>3</td><td>Jurnal Mengajar</td><td>Input jurnal (kelas, mapel, tanggal, materi, metode, catatan), riwayat jurnal, rekap jurnal per guru/kelas</td></tr>
+    <tr><td>4</td><td>Bimbingan Konseling</td><td>Input kasus BK, catatan konseling, pelanggaran, prestasi, rekap BK per siswa/kelas</td></tr>
+    <tr><td>5</td><td>Absensi</td><td>Input kehadiran per kelas/tanggal, status (hadir/sakit/izin/alpa), rekap absensi dengan persentase</td></tr>
+  </table>
+
+  <h3>6.2 Kebutuhan Non-Fungsional</h3>
+  <table>
+    <tr><th>No</th><th>Aspek</th><th>Kebutuhan</th></tr>
+    <tr><td>1</td><td>Keamanan</td><td>Sistem menggunakan RBAC dengan 7 role, password di-hash dengan bcrypt, session berbasis cookie</td></tr>
+    <tr><td>2</td><td>Skalabilitas</td><td>Arsitektur modular, pembagian vCPU, support horizontal dan vertical scaling</td></tr>
+    <tr><td>3</td><td>Kinerja</td><td>Index database pada kolom frequent query, query teroptimasi, rencana caching Redis</td></tr>
+    <tr><td>4</td><td>Integritas Data</td><td>Foreign key constraints, transaction ACID, normalisasi database hingga 3NF</td></tr>
+    <tr><td>5</td><td>Auditability</td><td>Semua aktivitas pengguna tercatat di tabel activity_logs dengan IP address dan timestamp</td></tr>
+  </table>
 </div>
 
-<!-- ==================== 8-9: DESKRIPSI & DAFTAR MODUL ==================== -->
+<!-- ==================== DESKRIPSI & DAFTAR MODUL ==================== -->
 <div class="page page-break">
   <h2>6. Deskripsi Sistem</h2>
   <p>Web Sekolah Terintegrasi adalah sistem informasi berbasis web yang dibangun menggunakan <strong>Node.js Express.js</strong> sebagai backend, <strong>MySQL</strong> sebagai database, <strong>Bootstrap 5</strong> sebagai framework frontend, dan <strong>EJS</strong> sebagai template engine. Sistem menggunakan pendekatan <em>Modular Monolith Architecture</em> di mana setiap modul memiliki router dan view sendiri tetapi berjalan dalam satu aplikasi.</p>
@@ -222,6 +245,12 @@
     <tr><td>vCPU 6</td><td>Backup & Caching (Redis)</td><td>Cache data sering diakses, backup periodik</td></tr>
   </table>
   <p>Pembagian ini memungkinkan setiap modul dikembangkan, di-scale, dan di-maintain secara independen. Jika modul Jurnal Mengajar mengalami lonjakan akses, vCPU 3 dapat di-scale tanpa mengganggu modul lain.</p>
+
+  <h3>10.1 Penjelasan Detail Arsitektur oleh System Architect</h3>
+  <p><strong>Alur Request Pengguna:</strong> User membuka browser → request masuk ke Load Balancer (vCPU 5) → Load Balancer meneruskan ke Web Server (vCPU 1) → Web Server menentukan modul tujuan berdasarkan route → Modul memproses data (query ke database vCPU 2) → Response dikembalikan ke user.</p>
+  <p><strong>API-Based Integration:</strong> Setiap modul menggunakan data bersama melalui query ke database MySQL yang sama. Di masa depan, setiap modul dapat dipisah menjadi service REST API yang berdiri sendiri dan berkomunikasi melalui HTTP/HTTPS. Contoh: Modul BK cukup memanggil endpoint API <code>/api/siswa/{id}</code> untuk mendapatkan data siswa tanpa perlu akses langsung ke database.</p>
+  <p><strong>Strategi Scaling:</strong> Untuk horizontal scaling, vCPU 3 (Jurnal) dapat ditambah instance-nya karena beban tertinggi. Load balancer akan mendistribusikan request ke instance-instance tersebut secara round-robin atau least-connection. Untuk vertical scaling, server database (vCPU 2) dapat ditingkatkan RAM/CPU-nya. Kombinasi keduanya disebut hybrid scaling.</p>
+  <p><strong>Monitoring:</strong> Rencana menggunakan PM2 untuk monitoring proses Node.js, Grafana + Prometheus untuk visualisasi metrik server (CPU, RAM, disk, request per detik), dan tabel <code>activity_logs</code> untuk audit aktivitas pengguna.</p>
 
   <div class="instruction">
     <strong>[INSTRUKSI GAMBAR 8 - Diagram vCPU]</strong><br>
@@ -486,28 +515,121 @@
     <tr><td>Orang Tua</td><td>ortu1</td><td>password123</td></tr>
   </table>
 
-  <h2>22. Panduan Penggunaan Laporan Ini</h2>
-  <p><strong>Cara membuat PDF:</strong></p>
+  <h2>22. Panduan Penyisipan Gambar ke Laporan</h2>
+
+  <h3>22.1 Cara Membuat PDF</h3>
   <ol>
-    <li>Buka file <code>laporan.html</code> di browser (Chrome/Edge).</li>
-    <li>Tekan Ctrl+P → pilih "Save as PDF".</li>
-    <li>Atur margin: None / Minimal. Centang "Background graphics".</li>
-    <li>Simpan dengan nama: <code>MID_ScalableSystemDesign_Kelompok2_TI4A.pdf</code></li>
+    <li>Buka <code>laporan.html</code> di Chrome/Edge.</li>
+    <li>Sisipkan semua gambar sesuai petunjuk di bawah (edit HTML).</li>
+    <li>Tekan <strong>Ctrl+P</strong> → Printer: "Save as PDF".</li>
+    <li>Centang <strong>"Background graphics"</strong>, margin: <strong>None</strong>.</li>
+    <li>Simpan sebagai <code>MID_ScalableSystemDesign_Kelompok2_TI4A.pdf</code>.</li>
   </ol>
-  <p><strong>Setelah itu:</strong> masukkan screenshot sesuai instruksi [INSTRUKSI GAMBAR] di atas, edit HTML untuk menyisipkan gambar, lalu print ulang ke PDF.</p>
+
+  <h3>22.2 Template Cara Sisipkan Gambar di HTML</h3>
+  <p style="background:#f5f5f7;padding:8pt 12pt;font-size:9pt;font-family:monospace;">
+    &lt;img src="nama_file.png" alt="Keterangan" style="width:100%;max-width:500px;display:block;margin:12pt auto;border:1px solid #ddd;border-radius:6px;"&gt;<br>
+    &lt;p style="text-align:center;font-size:9pt;color:#86868b;"&gt;<strong>Gambar X.</strong> Keterangan gambar&lt;/p&gt;
+  </p>
+
+  <h3>22.3 Daftar Semua Gambar + Peletakan + Yang Harus Ditampilkan</h3>
+
+  <table>
+    <tr><th>No</th><th>Letak Setelah Paragraf</th><th>Sumber / Cara Ambil</th><th>Yang Harus Tampak di Screenshot</th></tr>
+    <tr>
+      <td>1</td>
+      <td>Hal 3 — setelah "Deskripsi Sistem"</td>
+      <td>Login admin → buka /dashboard</td>
+      <td>6 kartu statistik (Siswa, Guru, Kelas, Jurnal, Kasus BK, Pengguna) + 5 grafik Chart.js (batang, garis, donat) + tabel log aktivitas + jam digital</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>Hal 4 — setelah fitur Manajemen Pengguna</td>
+      <td>Login admin → buka /users</td>
+      <td>Tabel daftar pengguna (kolom: Username, Nama, Email, Role, Status, Login, Aksi) + badge role + tombol Tambah User</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>Hal 4 — setelah fitur Kesiswaan</td>
+      <td>Login admin → buka /kesiswaan</td>
+      <td>Tabel daftar siswa (NIS, Nama, Kelas, Status) + tombol Import CSV + Export CSV + Tambah Siswa + filter kelas & status</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>Hal 5 — setelah fitur Jurnal Mengajar</td>
+      <td>Login guru1 → buka /jurnal</td>
+      <td>Tabel jurnal (Tanggal, Guru, Kelas, Mapel, Materi, Metode, Catatan) + tombol Input Jurnal + Rekap</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>Hal 5 — setelah fitur BK</td>
+      <td>Login guru_bk → buka /bk</td>
+      <td>4 tab: Kasus BK, Konseling, Pelanggaran, Prestasi — masing-masing dengan tabel + form input + tombol tambah</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>Hal 5 — setelah fitur Absensi</td>
+      <td>Login admin → buka /absensi</td>
+      <td>Summary cards (H:S:I:A per kelas) + tabel detail absensi (Tanggal, NIS, Siswa, Status, Keterangan) + filter kelas & tanggal</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td>Hal 5 — setelah gambar 6</td>
+      <td>Login admin → buka /absensi/rekap</td>
+      <td>Tabel rekap (NIS, Nama, Kelas, Total Hari, Hadir, Sakit, Izin, Alpa) + progress bar persentase kehadiran warna hijau/kuning/merah</td>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td>Hal 6 — setelah "Diagram Arsitektur"</td>
+      <td>Export docs/arsitektur.drawio → PNG</td>
+      <td>3 layer (Client → Application → Data) + 6 vCPU (Web Server, Database, Jurnal, BK/Kesiswaan, Load Balancer, Cache) + panah alur request</td>
+    </tr>
+    <tr>
+      <td>9</td>
+      <td>Hal 7 — setelah "Rancangan Pembagian vCPU"</td>
+      <td>Export docs/arsitektur.drawio → PNG (bisa gambar yg sama dengan no 8)</td>
+      <td>Diagram yang sama atau tabel vCPU yang sudah ditampilkan di laporan</td>
+    </tr>
+    <tr>
+      <td>10</td>
+      <td>Hal 8 — setelah "Entity Relationship Diagram"</td>
+      <td>Export docs/ERD.drawio → PNG</td>
+      <td>16 tabel lengkap: roles, users, academic_years, semesters, teachers, classes, subjects, students, schedules, teaching_journals, bk_cases, bk_counseling_notes, student_violations, student_achievements, attendances, activity_logs — dengan relasi FK antar tabel (garis panah)</td>
+    </tr>
+    <tr>
+      <td>11</td>
+      <td>Hal 9 — setelah "Rancangan Hak Akses"</td>
+      <td>Screenshot kode dari src/middleware/rbac.js</td>
+      <td>Kode function allowRoles(...roles) — tampilkan baris fungsi dan contoh penggunaannya di route, atau screenshot tabel RBAC dari laporan ini</td>
+    </tr>
+    <tr>
+      <td>12</td>
+      <td>Hal 10 — setelah "Use Case Diagram"</td>
+      <td>Export docs/use-case.drawio → PNG</td>
+      <td>6 aktor (Admin, Kepsek, Guru, Wali Kelas, Guru BK, Siswa) + 15 use case (Login, Kelola User, Reset Password, Kelola Siswa, Import/Export CSV, Wali Kelas, Input Jurnal, Rekap Jurnal, Absensi, Kasus BK, Pelanggaran, Prestasi, Konseling, Rekap BK, Dashboard) + garis relasi antar aktor dan use case</td>
+    </tr>
+    <tr>
+      <td>13</td>
+      <td>Hal 13 — setelah jawaban analisis (sebelum kesimpulan)</td>
+      <td>Screenshot dari halaman login</td>
+      <td>Form login dengan field username + password + tombol login + referensi akun demo di bawah form</td>
+    </tr>
+  </table>
+
+  <h3>22.4 Urutan Finalisasi Laporan</h3>
+  <ol>
+    <li>Ambil semua screenshot dari aplikasi (no 1-7, 11, 13) menggunakan Snipping Tool / Print Screen.</li>
+    <li>Export diagram drawio ke PNG (no 8, 10, 12) via app.diagrams.net.</li>
+    <li>Letakkan file gambar di folder <code>docs/</code> project.</li>
+    <li>Edit file <code>laporan.html</code> — cari setiap tag <code>[INSTRUKSI GAMBAR X]</code> dan ganti dengan tag &lt;img&gt; sesuai template di atas.</li>
+    <li>Buka laporan.html di Chrome, Ctrl+P → Save as PDF.</li>
+    <li>Upload PDF ke Google Drive atau repository GitHub.</li>
+  </ol>
 
   <div class="instruction">
-    <strong>[RINGKASAN SEMUA GAMBAR YANG HARUS DIAMBIL]</strong><br>
-    1. Dashboard utama (6 kartu stat + grafik + log)<br>
-    2. Manajemen Pengguna (daftar user + role + aksi)<br>
-    3. Data Kesiswaan (daftar siswa + tombol import/export)<br>
-    4. Jurnal Mengajar (tabel jurnal + modal input)<br>
-    5. BK (tab kasus, konseling, pelanggaran, prestasi)<br>
-    6. Absensi (summary cards + tabel) & Rekap Absensi (progress bar)<br>
-    7. Diagram Arsitektur (docs/arsitektur.png)<br>
-    8. ERD (docs/ERD.png)<br>
-    9. Use Case Diagram (docs/use-case.png)<br>
-    10. Kode middleware RBAC (src/middleware/rbac.js)
+    <strong>CONTOH PENULISAN SETELAH GAMBAR DISISIPKAN:</strong><br><br>
+    &lt;img src="docs/dashboard.png" alt="Dashboard" style="width:100%;max-width:500px;display:block;margin:12pt auto;border:1px solid #ddd;border-radius:6px;"&gt;<br>
+    &lt;p style="text-align:center;font-size:9pt;color:#86868b;"&gt;&lt;strong&gt;Gambar 1.&lt;/strong&gt; Tampilan Dashboard Web Sekolah Terintegrasi&lt;/p&gt;
   </div>
 </div>
 

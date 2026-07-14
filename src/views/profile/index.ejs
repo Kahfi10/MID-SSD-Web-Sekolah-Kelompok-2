@@ -1,0 +1,53 @@
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm rounded-4 mb-4">
+            <div class="card-header bg-white rounded-4 rounded-bottom-0 py-3">
+                <h5 class="mb-0"><i class="bi bi-person-circle"></i> Profil Saya</h5>
+            </div>
+            <div class="card-body">
+                <form action="/profile/update" method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Username</label>
+                        <input type="text" class="form-control" value="<%= profile.username %>" disabled>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Nama Lengkap</label>
+                        <input type="text" name="full_name" class="form-control" value="<%= profile.full_name %>" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" name="email" class="form-control" value="<%= profile.email %>" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Role</label>
+                        <input type="text" class="form-control" value="<%= profile.role_name %>" disabled>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100"><i class="bi bi-save"></i> Simpan Profil</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-header bg-white rounded-4 rounded-bottom-0 py-3">
+                <h5 class="mb-0"><i class="bi bi-key"></i> Ganti Password</h5>
+            </div>
+            <div class="card-body">
+                <form action="/profile/change-password" method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Password Saat Ini</label>
+                        <input type="password" name="current_password" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Password Baru</label>
+                        <input type="password" name="new_password" class="form-control" required minlength="6">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Konfirmasi Password Baru</label>
+                        <input type="password" name="confirm_password" class="form-control" required minlength="6">
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100"><i class="bi bi-shield-lock"></i> Ganti Password</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -293,4 +293,31 @@ router.get('/rekap', isAuthenticated, allowRoles('guru_bk', 'admin', 'kepala_sek
     }
 });
 
+// Search suggestions API (JSON)
+router.get('/api/search', isAuthenticated, allowRoles('guru_bk', 'admin', 'kepala_sekolah'), async (req, res) => {
+    try {
+        const { q } = req.query;
+        if (!q || q.length < 2) return res.json([]);
+        const [results] = await pool.query(
+            `SELECT s.id, s.nis, s.full_name as student_name, c.class_name,
+                    COUNT(bc.id) as total_cases
+             FROM students s
+             LEFT JOIN classes c ON s.class_id = c.id
+             LEFT JOIN bk_cases bc ON bc.student_id = s.id
+             WHERE s.full_name LIKE ? OR s.nis LIKE ?
+             GROUP BY s.id, s.nis, s.full_name, c.class_name
+             ORDER BY total_cases DESC LIMIT 8`,
+            [`%${q}%`, `%${q}%`]
+        );
+        const mapped = results.map(r => ({
+            ...r,
+            _href: '/bk?search=' + encodeURIComponent(r.student_name)
+        }));
+        res.json(mapped);
+    } catch (error) {
+        console.error(error);
+        res.json([]);
+    }
+});
+
 module.exports = router;

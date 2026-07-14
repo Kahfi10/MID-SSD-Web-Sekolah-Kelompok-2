@@ -12,15 +12,18 @@
     </div>
 </div>
 
-<form method="GET" class="mb-3">
-    <div class="input-group">
-        <input type="text" name="search" class="form-control" placeholder="Cari nama siswa, jenis kasus, pelanggaran, atau prestasi..." value="<%= typeof search !== 'undefined' ? search : '' %>">
-        <button class="btn btn-primary" type="submit"><i class="bi bi-search"></i></button>
-        <% if (typeof search !== 'undefined' && search) { %>
-        <a href="/bk" class="btn btn-outline-secondary"><i class="bi bi-x-lg"></i></a>
-        <% } %>
-    </div>
-</form>
+<div data-search-suggest="/bk/api/search" class="mb-3 position-relative">
+    <form method="GET">
+        <div class="input-group">
+            <input type="text" name="search" class="form-control" placeholder="Cari nama siswa, jenis kasus, pelanggaran, atau prestasi..." value="<%= typeof search !== 'undefined' ? search : '' %>" autocomplete="off">
+            <button class="btn btn-primary" type="submit"><i class="bi bi-search"></i></button>
+            <% if (typeof search !== 'undefined' && search) { %>
+            <a href="/bk" class="btn btn-outline-secondary"><i class="bi bi-x-lg"></i></a>
+            <% } %>
+        </div>
+    </form>
+    <div class="search-suggest-dropdown list-group position-absolute w-100 shadow-sm rounded-3 d-none" style="z-index:1000;top:100%;left:0;"></div>
+</div>
 <!-- Kasus -->
 <div class="card border-0 shadow-sm rounded-4 mb-3">
     <div class="card-header bg-white rounded-4 rounded-bottom-0 py-3">

@@ -208,4 +208,37 @@ router.get('/rekap', isAuthenticated, allowRoles('admin', 'kepala_sekolah', 'wal
     }
 });
 
+// Search suggestions API (JSON)
+router.get('/api/search', isAuthenticated, allowRoles('guru', 'admin', 'kepala_sekolah', 'wali_kelas'), async (req, res) => {
+    try {
+        const { q } = req.query;
+        if (!q || q.length < 2) return res.json([]);
+        let conditions = [];
+        let params = [];
+        if (req.session.user.role_name === 'guru') {
+            const [teacher] = await pool.query('SELECT id FROM teachers WHERE user_id = ?', [req.session.user.id]);
+            if (teacher.length > 0) {
+                conditions.push('tj.teacher_id = ?');
+                params.push(teacher[0].id);
+            }
+        }
+        conditions.push('(tj.material LIKE ? OR c.class_name LIKE ? OR s.subject_name LIKE ? OR t.full_name LIKE ?)');
+        params.push(`%${q}%`, `%${q}%`, `%${q}%`, `%${q}%`);
+        const where = 'WHERE ' + conditions.join(' AND ');
+        const [results] = await pool.query(
+            `SELECT tj.id, tj.material, tj.teaching_date, c.class_name, s.subject_name, t.full_name as teacher_name
+             FROM teaching_journals tj
+             JOIN classes c ON tj.class_id = c.id
+             JOIN subjects s ON tj.subject_id = s.id
+             JOIN teachers t ON tj.teacher_id = t.id
+             ${where}
+             ORDER BY tj.teaching_date DESC LIMIT 8`, params
+        );
+        res.json(results);
+    } catch (error) {
+        console.error(error);
+        res.json([]);
+    }
+});
+
 module.exports = router;

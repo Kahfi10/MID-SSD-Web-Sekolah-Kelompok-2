@@ -7,8 +7,13 @@ const { allowRoles } = require('../../middleware/rbac');
 router.get('/', isAuthenticated, allowRoles('guru', 'admin', 'kepala_sekolah', 'wali_kelas'), async (req, res) => {
     try {
         const { search } = req.query;
+        let page = parseInt(req.query.page) || 1;
+        let limit = 10;
+        let offset = (page - 1) * limit;
         let conditions = [];
         let params = [];
+        let countConditions = [];
+        let countParams = [];
 
         if (req.session.user.role_name === 'guru') {
             const [teacher] = await pool.query('SELECT id FROM teachers WHERE user_id = ?', [req.session.user.id]);
@@ -18,11 +23,17 @@ router.get('/', isAuthenticated, allowRoles('guru', 'admin', 'kepala_sekolah', '
             }
             conditions.push('tj.teacher_id = ?');
             params.push(teacher[0].id);
+            countConditions.push('tj.teacher_id = ?');
+            countParams.push(teacher[0].id);
         }
 
         if (search) {
-            conditions.push('(tj.material LIKE ? OR c.class_name LIKE ? OR s.subject_name LIKE ? OR t.full_name LIKE ?)');
-            params.push(`%${search}%`, `%${search}%`, `%${search}%`, `%${search}%`);
+            let searchCond = '(tj.material LIKE ? OR c.class_name LIKE ? OR s.subject_name LIKE ? OR t.full_name LIKE ?)';
+            let searchVals = [`%${search}%`, `%${search}%`, `%${search}%`, `%${search}%`];
+            conditions.push(searchCond);
+            params.push(...searchVals);
+            countConditions.push(searchCond);
+            countParams.push(...searchVals);
         }
 
         const whereClause = conditions.length > 0 ? 'WHERE ' + conditions.join(' AND ') : '';
@@ -32,9 +43,17 @@ router.get('/', isAuthenticated, allowRoles('guru', 'admin', 'kepala_sekolah', '
                  JOIN subjects s ON tj.subject_id = s.id
                  JOIN teachers t ON tj.teacher_id = t.id
                  ${whereClause}
-                 ORDER BY tj.teaching_date DESC`;
+                 ORDER BY tj.teaching_date DESC LIMIT ? OFFSET ?`;
+        params.push(limit, offset);
+
+        const countWhere = countConditions.length > 0 ? 'WHERE ' + countConditions.join(' AND ') : '';
+        const countQuery = `SELECT COUNT(*) as total FROM teaching_journals tj JOIN classes c ON tj.class_id = c.id JOIN subjects s ON tj.subject_id = s.id JOIN teachers t ON tj.teacher_id = t.id ${countWhere}`;
 
         const [journals] = await pool.query(query, params);
+        const [countResult] = await pool.query(countQuery, countParams);
+        const total = countResult[0].total;
+        const totalPages = Math.ceil(total / limit);
+
         const [classes] = await pool.query('SELECT * FROM classes');
         const [subjects] = await pool.query('SELECT * FROM subjects');
         const [teachers] = await pool.query('SELECT * FROM teachers');
@@ -48,7 +67,10 @@ router.get('/', isAuthenticated, allowRoles('guru', 'admin', 'kepala_sekolah', '
             teachers,
             semesters,
             userRole: req.session.user.role_name,
-            search
+            search,
+            page,
+            totalPages,
+            total
         });
 
     } catch (error) {

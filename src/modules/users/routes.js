@@ -8,22 +8,32 @@ const { allowRoles } = require('../../middleware/rbac');
 router.get('/', isAuthenticated, allowRoles('admin'), async (req, res) => {
     try {
         const { search } = req.query;
-        let userQuery, userParams;
+        let page = parseInt(req.query.page) || 1;
+        let limit = 10;
+        let offset = (page - 1) * limit;
+        let userQuery, countQuery, userParams, countParams;
+
         if (search) {
-            userQuery = `SELECT u.*, r.name as role_name 
-             FROM users u JOIN roles r ON u.role_id = r.id 
-             WHERE u.full_name LIKE ? OR u.username LIKE ? OR u.email LIKE ?
-             ORDER BY u.created_at DESC`;
-            userParams = [`%${search}%`, `%${search}%`, `%${search}%`];
+            let where = 'WHERE (u.full_name LIKE ? OR u.username LIKE ? OR u.email LIKE ?)';
+            let likeParams = [`%${search}%`, `%${search}%`, `%${search}%`];
+            userQuery = `SELECT u.*, r.name as role_name FROM users u JOIN roles r ON u.role_id = r.id ${where} ORDER BY u.created_at DESC LIMIT ? OFFSET ?`;
+            userParams = [...likeParams, limit, offset];
+            countQuery = `SELECT COUNT(*) as total FROM users u ${where}`;
+            countParams = likeParams;
         } else {
-            userQuery = `SELECT u.*, r.name as role_name 
-             FROM users u JOIN roles r ON u.role_id = r.id 
-             ORDER BY u.created_at DESC`;
-            userParams = [];
+            userQuery = `SELECT u.*, r.name as role_name FROM users u JOIN roles r ON u.role_id = r.id ORDER BY u.created_at DESC LIMIT ? OFFSET ?`;
+            userParams = [limit, offset];
+            countQuery = `SELECT COUNT(*) as total FROM users`;
+            countParams = [];
         }
+
         const [users] = await pool.query(userQuery, userParams);
+        const [countResult] = await pool.query(countQuery, countParams);
+        const total = countResult[0].total;
+        const totalPages = Math.ceil(total / limit);
+
         const [roles] = await pool.query('SELECT * FROM roles');
-        res.render('users/index', { title: 'Manajemen Pengguna', users, roles, search });
+        res.render('users/index', { title: 'Manajemen Pengguna', users, roles, search, page, totalPages, total });
     } catch (error) {
         console.error(error);
         req.flash('error', 'Gagal memuat data');

@@ -13,24 +13,29 @@ const upload = multer({ dest: path.join(__dirname, '../../public/uploads/') });
 router.get('/', isAuthenticated, allowRoles('admin', 'kepala_sekolah', 'wali_kelas'), async (req, res) => {
     try {
         const { search } = req.query;
-        let studentQuery, studentParams;
+        let page = parseInt(req.query.page) || 1;
+        let limit = 10;
+        let offset = (page - 1) * limit;
+        let studentQuery, countQuery, studentParams, countParams;
         if (search) {
-            studentQuery = `SELECT s.*, c.class_name, c.grade_level 
-             FROM students s 
-             LEFT JOIN classes c ON s.class_id = c.id 
-             WHERE s.full_name LIKE ? OR s.nis LIKE ?
-             ORDER BY s.created_at DESC`;
-            studentParams = [`%${search}%`, `%${search}%`];
+            let where = 'WHERE (s.full_name LIKE ? OR s.nis LIKE ?)';
+            let likeParams = [`%${search}%`, `%${search}%`];
+            studentQuery = `SELECT s.*, c.class_name, c.grade_level FROM students s LEFT JOIN classes c ON s.class_id = c.id ${where} ORDER BY s.created_at DESC LIMIT ? OFFSET ?`;
+            studentParams = [...likeParams, limit, offset];
+            countQuery = `SELECT COUNT(*) as total FROM students s ${where}`;
+            countParams = likeParams;
         } else {
-            studentQuery = `SELECT s.*, c.class_name, c.grade_level 
-             FROM students s 
-             LEFT JOIN classes c ON s.class_id = c.id 
-             ORDER BY s.created_at DESC`;
-            studentParams = [];
+            studentQuery = `SELECT s.*, c.class_name, c.grade_level FROM students s LEFT JOIN classes c ON s.class_id = c.id ORDER BY s.created_at DESC LIMIT ? OFFSET ?`;
+            studentParams = [limit, offset];
+            countQuery = `SELECT COUNT(*) as total FROM students`;
+            countParams = [];
         }
         const [students] = await pool.query(studentQuery, studentParams);
+        const [countResult] = await pool.query(countQuery, countParams);
+        const total = countResult[0].total;
+        const totalPages = Math.ceil(total / limit);
         const [classes] = await pool.query('SELECT * FROM classes');
-        res.render('kesiswaan/index', { title: 'Data Kesiswaan', students, classes, search });
+        res.render('kesiswaan/index', { title: 'Data Kesiswaan', students, classes, search, page, totalPages, total });
     } catch (error) {
         console.error(error);
         req.flash('error', 'Gagal memuat data');

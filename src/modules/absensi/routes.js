@@ -8,14 +8,18 @@ const { allowRoles } = require('../../middleware/rbac');
 router.get('/', isAuthenticated, allowRoles('admin', 'kepala_sekolah', 'guru', 'wali_kelas'), async (req, res) => {
     try {
         const { class_id, start_date, end_date, search } = req.query;
-        let params = [];
-        let conditions = [];
+        let page = parseInt(req.query.page) || 1;
+        let limit = 10;
+        let offset = (page - 1) * limit;
+        let params = [], countParams = [];
+        let conditions = [], countConditions = [];
 
-        if (class_id) { conditions.push('a.class_id = ?'); params.push(class_id); }
-        if (start_date) { conditions.push('a.attendance_date >= ?'); params.push(start_date); }
-        if (end_date) { conditions.push('a.attendance_date <= ?'); params.push(end_date); }
-        if (search) { conditions.push('(s.full_name LIKE ? OR s.nis LIKE ?)'); params.push(`%${search}%`, `%${search}%`); }
+        if (class_id) { conditions.push('a.class_id = ?'); params.push(class_id); countConditions.push('a.class_id = ?'); countParams.push(class_id); }
+        if (start_date) { conditions.push('a.attendance_date >= ?'); params.push(start_date); countConditions.push('a.attendance_date >= ?'); countParams.push(start_date); }
+        if (end_date) { conditions.push('a.attendance_date <= ?'); params.push(end_date); countConditions.push('a.attendance_date <= ?'); countParams.push(end_date); }
+        if (search) { conditions.push('(s.full_name LIKE ? OR s.nis LIKE ?)'); params.push(`%${search}%`, `%${search}%`); countConditions.push('(s.full_name LIKE ? OR s.nis LIKE ?)'); countParams.push(`%${search}%`, `%${search}%`); }
         const where = conditions.length > 0 ? 'WHERE ' + conditions.join(' AND ') : '';
+        const countWhere = countConditions.length > 0 ? 'WHERE ' + countConditions.join(' AND ') : '';
 
         const [attendances] = await pool.query(
             `SELECT a.*, s.full_name as student_name, s.nis, c.class_name,
@@ -25,8 +29,15 @@ router.get('/', isAuthenticated, allowRoles('admin', 'kepala_sekolah', 'guru', '
              JOIN classes c ON a.class_id = c.id
              JOIN users u ON a.created_by = u.id
              ${where}
-             ORDER BY a.attendance_date DESC, c.class_name, s.full_name`, params
+             ORDER BY a.attendance_date DESC, c.class_name, s.full_name
+             LIMIT ? OFFSET ?`, [...params, limit, offset]
         );
+
+        const [countResult] = await pool.query(
+            `SELECT COUNT(*) as total FROM attendances a JOIN students s ON a.student_id = s.id JOIN classes c ON a.class_id = c.id ${countWhere}`, countParams
+        );
+        const total = countResult[0].total;
+        const totalPages = Math.ceil(total / limit);
 
         const [classes] = await pool.query('SELECT * FROM classes ORDER BY grade_level, class_name');
         const [summary] = await pool.query(
@@ -48,7 +59,10 @@ router.get('/', isAuthenticated, allowRoles('admin', 'kepala_sekolah', 'guru', '
             attendances,
             classes,
             summary,
-            filters: { class_id, start_date, end_date, search }
+            filters: { class_id, start_date, end_date, search },
+            page,
+            totalPages,
+            total
         });
     } catch (error) {
         console.error(error);

@@ -10,55 +10,78 @@ router.get('/', isAuthenticated, allowRoles('guru_bk', 'admin', 'kepala_sekolah'
         const { search } = req.query;
         const [bkTeacher] = await pool.query('SELECT id FROM teachers WHERE user_id = ?', [req.session.user.id]);
 
-        let caseCond = '', counselCond = '', violCond = '', achievCond = '';
-        let caseParams = [], counselParams = [], violParams = [], achievParams = [];
+        let page = parseInt(req.query.page) || 1;
+        let limit = 10;
+        let offset = (page - 1) * limit;
+        let caseCond = '', caseCountCond = '';
+        let caseParams = [], caseCountParams = [];
 
         if (search) {
             caseCond = 'WHERE (s.full_name LIKE ? OR bc.case_type LIKE ? OR bc.description LIKE ?)';
             caseParams = [`%${search}%`, `%${search}%`, `%${search}%`];
-            counselCond = 'WHERE (s.full_name LIKE ? OR bcn.topic LIKE ?)';
-            counselParams = [`%${search}%`, `%${search}%`];
-            violCond = 'WHERE (s.full_name LIKE ? OR sv.violation_type LIKE ?)';
-            violParams = [`%${search}%`, `%${search}%`];
-            achievCond = 'WHERE (s.full_name LIKE ? OR sa.achievement_name LIKE ?)';
-            achievParams = [`%${search}%`, `%${search}%`];
+            caseCountCond = caseCond;
+            caseCountParams = [...caseParams];
         }
 
-        // Get cases
+        // Get cases with pagination
         const [cases] = await pool.query(
             `SELECT bc.*, s.full_name as student_name, s.nis, c.class_name
              FROM bk_cases bc
              JOIN students s ON bc.student_id = s.id
              LEFT JOIN classes c ON s.class_id = c.id
              ${caseCond}
-             ORDER BY bc.created_at DESC`, caseParams
+             ORDER BY bc.created_at DESC LIMIT ? OFFSET ?`, [...caseParams, limit, offset]
         );
 
-        // Get counseling notes
+        const [countResult] = await pool.query(
+            `SELECT COUNT(*) as total FROM bk_cases bc JOIN students s ON bc.student_id = s.id ${caseCountCond}`, caseCountParams
+        );
+        const total = countResult[0].total;
+        const totalPages = Math.ceil(total / limit);
+
+        // Get counseling notes (last 10)
+        let counselCond = '';
+        let counselParams = [];
+        if (search) {
+            counselCond = 'WHERE (s.full_name LIKE ? OR bcn.topic LIKE ?)';
+            counselParams = [`%${search}%`, `%${search}%`];
+        }
         const [counseling] = await pool.query(
             `SELECT bcn.*, s.full_name as student_name, s.nis
              FROM bk_counseling_notes bcn
              JOIN students s ON bcn.student_id = s.id
              ${counselCond}
-             ORDER BY bcn.created_at DESC`, counselParams
+             ORDER BY bcn.created_at DESC LIMIT 10`, counselParams
         );
 
-        // Get violations
+        // Get violations (last 10)
+        let violCond = '';
+        let violParams = [];
+        if (search) {
+            violCond = 'WHERE (s.full_name LIKE ? OR sv.violation_type LIKE ?)';
+            violParams = [`%${search}%`, `%${search}%`];
+        }
         const [violations] = await pool.query(
             `SELECT sv.*, s.full_name as student_name, s.nis
              FROM student_violations sv
              JOIN students s ON sv.student_id = s.id
              ${violCond}
-             ORDER BY sv.created_at DESC`, violParams
+             ORDER BY sv.created_at DESC LIMIT 10`, violParams
         );
 
-        // Get achievements
+        // Get achievements (last 10)
+        let achievCond = '';
+        let achievParams = [];
+        if (search) {
+            achievCond = 'WHERE (s.full_name LIKE ? OR sa.achievement_name LIKE ?)';
+            achievParams = [`%${search}%`, `%${search}%`];
+        }
         const [achievements] = await pool.query(
             `SELECT sa.*, s.full_name as student_name, s.nis
              FROM student_achievements sa
              JOIN students s ON sa.student_id = s.id
              ${achievCond}
-             ORDER BY sa.created_at DESC`, achievParams
+             ORDER BY sa.created_at DESC LIMIT 10`, achievParams
         );
 
         const [students] = await pool.query('SELECT * FROM students WHERE status = ?', ['aktif']);
@@ -71,7 +94,10 @@ router.get('/', isAuthenticated, allowRoles('guru_bk', 'admin', 'kepala_sekolah'
             achievements,
             students,
             bkTeacher: bkTeacher.length > 0 ? bkTeacher[0] : null,
-            search
+            search,
+            page,
+            totalPages,
+            total
         });
 
     } catch (error) {

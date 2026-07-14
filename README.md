@@ -25,17 +25,18 @@ Mata Kuliah: RPL-A Scalable System Design
 | System Analyst | Latar belakang, tujuan, analisis kebutuhan, alur sistem, use case | Ashabul Kahfi |
 | System Architect | Arsitektur sistem, pembagian vCPU, load balancing, API integration, scaling strategy, monitoring, logging | Marhepi Rahmadani |
 | Database Designer | Rancangan database, ERD, tabel, relasi, indeks, konsistensi data | Muh. Eka Andri Setiawan |
-| UI/UX & Documentation | Rancangan tampilan, diagram pendukung, dokumentasi, laporan | Afra Muawiyah |
+| UI/UX & Documentation | Rancangan tampilan, diagram pendukung, dokumentasi, laporan | Afra Muawiya |
 | Security & Access Control | Role pengguna, pembatasan akses, audit log, autentikasi, mitigasi risiko | Alyah Saputri Bakri |
 
 ---
 
 ## Daftar Modul
 
-1. **Modul Manajemen Pengguna** - Login, logout, manajemen akun & role, audit log
-2. **Modul Data Kesiswaan** - CRUD siswa, kelola kelas, wali kelas, status siswa, import/export
-3. **Modul Jurnal Mengajar** - Input jurnal, pilih kelas/mapel, riwayat, rekap
-4. **Modul Bimbingan Konseling (BK)** - Catatan konseling, kasus, pelanggaran, prestasi
+1. **Modul Manajemen Pengguna** - Login, logout, manajemen akun & role, audit log, reset password
+2. **Modul Data Kesiswaan** - CRUD siswa, kelola kelas, wali kelas, status siswa, import/export CSV
+3. **Modul Jurnal Mengajar** - Input jurnal, pilih kelas/mapel, riwayat, rekap jurnal
+4. **Modul Bimbingan Konseling (BK)** - Catatan konseling, kasus, pelanggaran, prestasi, rekap BK
+5. **Modul Absensi** - Input kehadiran per kelas/tanggal, rekap absensi per siswa dengan persentase
 
 ---
 
@@ -78,7 +79,8 @@ MID-SSD-Web-Sekolah-Kelompok2/
 │   │   ├── users/          # Manajemen pengguna
 │   │   ├── kesiswaan/      # Data kesiswaan
 │   │   ├── jurnal/         # Jurnal mengajar
-│   │   └── bk/             # Bimbingan konseling
+│   │   ├── bk/             # Bimbingan konseling
+│   │   └── absensi/        # Absensi siswa
 │   ├── public/
 │   │   ├── css/style.css
 │   │   └── js/script.js
@@ -89,7 +91,8 @@ MID-SSD-Web-Sekolah-Kelompok2/
 │       ├── users/
 │       ├── kesiswaan/
 │       ├── jurnal/
-│       └── bk/
+│       ├── bk/
+│       └── absensi/
 ├── .env.example
 ├── .gitignore
 ├── package.json
@@ -103,7 +106,7 @@ MID-SSD-Web-Sekolah-Kelompok2/
 ![Arsitektur Sistem](docs/arsitektur.png)
 
 ### Deskripsi Arsitektur:
-- **Modular Monolith Architecture**: Sistem dibagi menjadi modul-modul terpisah (auth, users, kesiswaan, jurnal, bk) tetapi berjalan dalam satu aplikasi.
+- **Modular Monolith Architecture**: Sistem dibagi menjadi modul-modul terpisah (auth, users, kesiswaan, jurnal, bk, absensi) tetapi berjalan dalam satu aplikasi.
 - **Centralized Database**: Semua modul menggunakan satu database MySQL.
 - **Middleware-based Routing**: Setiap modul memiliki router sendiri dengan middleware autentikasi dan RBAC.
 - **Session-based Authentication**: Menggunakan express-session untuk manajemen login.
@@ -125,7 +128,7 @@ MID-SSD-Web-Sekolah-Kelompok2/
 
 Database: `db_sekolah_ssd`
 
-### Minimal 15 Tabel:
+### Minimal 16 Tabel:
 
 1. **roles** - Role pengguna (admin, guru, bk, siswa, dll)
 2. **users** - Data akun pengguna
@@ -142,6 +145,7 @@ Database: `db_sekolah_ssd`
 13. **student_violations** - Pelanggaran siswa
 14. **student_achievements** - Prestasi siswa
 15. **activity_logs** - Log aktivitas
+16. **attendances** - Absensi kehadiran siswa
 
 ### Relasi Utama:
 - `users.role_id` → `roles.id`

@@ -22,11 +22,11 @@ Mata Kuliah: RPL-A Scalable System Design
 
 | No | Nama | NIM | Peran | Tugas Pokok | Fitur Spesifik |
 |----|------|-----|-------|-------------|----------------|
-| 1 | Ashabul Kahfi | 105841108523 | System Analyst / Project Lead | Latar belakang, tujuan, analisis kebutuhan, alur sistem, use case | Modul Absensi (full CRUD), Rekap Jurnal Mengajar, Reset Password |
-| 2 | Marhepi Rahmadani | 105841109523 | System Architect | Arsitektur sistem, pembagian vCPU, load balancing, scaling strategy, monitoring, logging | Rekap BK (kasus, pelanggaran, prestasi per siswa/kelas) |
-| 3 | Muh. Eka Andri Setiawan | 105841110723 | Database Designer | Rancangan database, ERD, tabel, relasi, indeks, konsistensi data | Kelola Wali Kelas (assign wali ke kelas), schema 16 tabel |
-| 4 | Afra Muawiya | 105841108423 | UI/UX & Documentation | Rancangan tampilan, diagram pendukung, dokumentasi, laporan, video | Import CSV siswa, Apple monochrome theme CSS, README |
-| 5 | Alyah Saputri Bakri | 105841107723 | Security & Access Control | Role pengguna, pembatasan akses, audit log, autentikasi, mitigasi risiko | Export CSV siswa, middleware RBAC (allowRoles), audit log |
+| 1 | Ashabul Kahfi | 105841108523 | System Analyst / Project Lead | Menyusun latar belakang, tujuan, analisis kebutuhan, alur sistem, dan use case | Modul Absensi (CRUD), Rekap Jurnal, Reset Password |
+| 2 | Marhepi Rahmadani | 105841109523 | System Architect | Menyusun arsitektur sistem, pembagian vCPU, load balancing, API integration, scaling strategy, monitoring, dan logging | Rekap BK (kasus/pelanggaran/prestasi per siswa/kelas) |
+| 3 | Muh. Eka Andri Setiawan | 105841110723 | Database Designer | Menyusun rancangan database, ERD, tabel, relasi, indeks, dan penjelasan konsistensi data | Kelola Wali Kelas (assign wali ke kelas), schema 16 tabel |
+| 4 | Afra Muawiya | 105841108423 | UI/UX & Documentation Designer | Membuat rancangan tampilan, diagram pendukung, dokumentasi akhir, dan menyusun laporan agar rapi | Import CSV siswa, Apple monochrome theme CSS, README |
+| 5 | Alyah Saputri Bakri | 105841107723 | Security & Access Control Designer | Merancang role pengguna, pembatasan akses data, audit log, autentikasi, dan mitigasi risiko keamanan | Export CSV siswa, middleware RBAC (allowRoles), audit log |
 
 ---
 

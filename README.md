@@ -20,13 +20,13 @@ Mata Kuliah: RPL-A Scalable System Design
 
 ## Pembagian Tugas
 
-| No | Nama | NIM | Peran | Tugas Pokok | Fitur Spesifik |
-|----|------|-----|-------|-------------|----------------|
-| 1 | Ashabul Kahfi | 105841108523 | System Analyst / Project Lead | Menyusun latar belakang, tujuan, analisis kebutuhan, alur sistem, dan use case | Modul Absensi (CRUD), Rekap Jurnal, Reset Password |
-| 2 | Marhepi Rahmadani | 105841109523 | System Architect | Menyusun arsitektur sistem, pembagian vCPU, load balancing, API integration, scaling strategy, monitoring, dan logging | Rekap BK (kasus/pelanggaran/prestasi per siswa/kelas) |
-| 3 | Muh. Eka Andri Setiawan | 105841110723 | Database Designer | Menyusun rancangan database, ERD, tabel, relasi, indeks, dan penjelasan konsistensi data | Kelola Wali Kelas (assign wali ke kelas), schema 16 tabel |
-| 4 | Afra Muawiya | 105841108423 | UI/UX & Documentation Designer | Membuat rancangan tampilan, diagram pendukung, dokumentasi akhir, dan menyusun laporan agar rapi | Import CSV siswa, Apple monochrome theme CSS, README |
-| 5 | Alyah Saputri Bakri | 105841107723 | Security & Access Control Designer | Merancang role pengguna, pembatasan akses data, audit log, autentikasi, dan mitigasi risiko keamanan | Export CSV siswa, middleware RBAC (allowRoles), audit log |
+| No | Nama | NIM | Peran | Tugas Pokok | Commit Unggulan |
+|----|------|-----|-------|-------------|-----------------|
+| 1 | **Ashabul Kahfi** | 105841108523 | System Analyst / Project Lead | Dokumen analisis sistem, use case diagram, inisialisasi project MVC modular, dashboard + grafik Chart.js + live clock, theme Apple monochrome, modul Absensi & Jurnal, data seed 50+ jurnal, deployment Oracle Cloud + Nginx + PM2 + HTTPS | `f2e09c9` Init project | `e04a9e3` Docs system analysis | `0171468` Dashboard + grafik | `a09c090` Theme Apple | `0fc5aeb` Modul Absensi | `cf039db` Rekap Jurnal | `11213b2` Profil & Ganti Password | `4527d10` Search bar | `72731bd` Pagination | `0133f81` `a69177e` `bb2d8fc` Search suggestion AJAX | `63c921f` Seed 50+ jurnal | `cad66f6` Dashboard Siswa (co-author) | `8cd0bb5` Date Range Filter (co-author) |
+| 2 | **Marhepi Rahmadani** | 105841109523 | System Architect | Dokumen arsitektur detail, struktur folder MVC modular, modul BK (4 sub-modul + rekap BK), reset password, search suggestion AJAX, perbaikan bug | `f521b4c` Docs arsitektur detail | `b12a7b0` `1e2a6e7` Modul BK + Rekap BK | `5a0850e` Reset Password (co-author) | `a69177e` `bb2d8fc` `c13cd47` `9fcd3ab` Search suggestion + fix |
+| 3 | Muh. Eka Andri Setiawan | 105841110723 | Database Designer | Dokumen database spesifikasi, kelola wali kelas, search bar, pagination, schema 16 tabel + relasi | `298cd02` Docs database spesifikasi | `c3a151b` `d9ebcb3` Kelola Wali Kelas | `4527d10` Search bar (co-author) | `72731bd` Pagination (co-author) |
+| 4 | Afra Muawiya | 105841108423 | UI/UX & Documentation Designer | Dokumen UI/UX design, laporan HTML 22 section, pembagian tugas, naskah video, import CSV, responsive CSS, dashboard siswa, README | `2125f6c` Docs UI/UX design | `b9e6272` Laporan HTML | `f7a5a10` `1799c59` Import CSV | `585483a` Responsive CSS | `cad66f6` Dashboard Siswa (co-author) |
+| 5 | Alyah Saputri Bakri | 105841107723 | Security & Access Control Designer | Dokumen keamanan RBAC, middleware auth.js & rbac.js, export CSV, use case diagram, date range filter, audit log activity_logs | `980eac2` Docs RBAC | `ef280a1` `9f2ada3` Use case diagram | `71f6d30` `40ca64e` Export CSV | `8cd0bb5` Date Range Filter (co-author) |
 
 ---
 

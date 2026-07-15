@@ -90,10 +90,12 @@ CREATE TABLE students (
     address TEXT,
     phone VARCHAR(20),
     class_id INT,
+    user_id INT,
     status ENUM('aktif','pindah','lulus','keluar') DEFAULT 'aktif',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (class_id) REFERENCES classes(id)
+    FOREIGN KEY (class_id) REFERENCES classes(id),
+    FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
 -- 9. Tabel schedules

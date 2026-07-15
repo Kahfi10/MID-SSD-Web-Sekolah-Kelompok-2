@@ -1,0 +1,185 @@
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h4 class="mb-1"><i class="bi bi-person-vcard"></i> Dashboard Siswa</h4>
+        <p class="text-muted mb-0" style="font-size:0.85rem;">Selamat datang, <strong><%= student.full_name %></strong></p>
+    </div>
+</div>
+
+<!-- Info Siswa -->
+<div class="card border-0 shadow-sm rounded-4 mb-4">
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-3">
+                <small class="text-muted d-block">NIS</small>
+                <span class="fw-semibold"><%= student.nis %></span>
+            </div>
+            <div class="col-md-3">
+                <small class="text-muted d-block">Kelas</small>
+                <span class="fw-semibold"><%= student.grade_level %> <%= student.class_name %></span>
+            </div>
+            <div class="col-md-3">
+                <small class="text-muted d-block">Jenis Kelamin</small>
+                <span class="fw-semibold"><%= student.gender === 'L' ? 'Laki-laki' : 'Perempuan' %></span>
+            </div>
+            <div class="col-md-3">
+                <small class="text-muted d-block">Status</small>
+                <span class="badge bg-success"><%= student.status %></span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Cards Statistik -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm rounded-4 text-center py-3">
+            <div class="fs-3 fw-bold" style="color:#34c759;"><%= attendanceRecap.find(a => a.status === 'hadir')?.total || 0 %></div>
+            <small class="text-muted">Hadir</small>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm rounded-4 text-center py-3">
+            <div class="fs-3 fw-bold" style="color:#ff9500;"><%= attendanceRecap.find(a => a.status === 'sakit')?.total || 0 %></div>
+            <small class="text-muted">Sakit</small>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm rounded-4 text-center py-3">
+            <div class="fs-3 fw-bold" style="color:#007aff;"><%= attendanceRecap.find(a => a.status === 'izin')?.total || 0 %></div>
+            <small class="text-muted">Izin</small>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm rounded-4 text-center py-3">
+            <div class="fs-3 fw-bold" style="color:#ff3b30;"><%= attendanceRecap.find(a => a.status === 'alpa')?.total || 0 %></div>
+            <small class="text-muted">Alpa</small>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Absensi Terbaru -->
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-header bg-white rounded-4 rounded-bottom-0 py-3">
+                <h6 class="mb-0"><i class="bi bi-calendar-check"></i> Riwayat Absensi</h6>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead><tr><th>Tanggal</th><th>Status</th><th>Keterangan</th></tr></thead>
+                        <tbody>
+                            <% if (recentAttendances.length > 0) { %>
+                                <% recentAttendances.forEach(function(a) { %>
+                                <tr>
+                                    <td><%= a.attendance_date %></td>
+                                    <td>
+                                        <% if (a.status === 'hadir') { %><span class="badge" style="background:#34c759;">Hadir</span>
+                                        <% } else if (a.status === 'sakit') { %><span class="badge" style="background:#ff9500;">Sakit</span>
+                                        <% } else if (a.status === 'izin') { %><span class="badge" style="background:#007aff;">Izin</span>
+                                        <% } else { %><span class="badge" style="background:#ff3b30;">Alpa</span><% } %>
+                                    </td>
+                                    <td><%= a.notes || '-' %></td>
+                                </tr>
+                                <% }); %>
+                            <% } else { %>
+                                <tr><td colspan="3" class="text-center text-muted py-3">Belum ada data absensi</td></tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Prestasi -->
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-header bg-white rounded-4 rounded-bottom-0 py-3">
+                <h6 class="mb-0"><i class="bi bi-trophy text-warning"></i> Prestasi</h6>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead><tr><th>Tanggal</th><th>Prestasi</th><th>Tingkat</th></tr></thead>
+                        <tbody>
+                            <% if (achievements.length > 0) { %>
+                                <% achievements.forEach(function(a) { %>
+                                <tr>
+                                    <td><%= a.achievement_date %></td>
+                                    <td><%= a.achievement_name %></td>
+                                    <td><%= a.level || '-' %></td>
+                                </tr>
+                                <% }); %>
+                            <% } else { %>
+                                <tr><td colspan="3" class="text-center text-muted py-3">Belum ada prestasi</td></tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pelanggaran -->
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-header bg-white rounded-4 rounded-bottom-0 py-3">
+                <h6 class="mb-0"><i class="bi bi-shield-exclamation text-danger"></i> Pelanggaran</h6>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead><tr><th>Tanggal</th><th>Jenis</th><th>Sanksi</th></tr></thead>
+                        <tbody>
+                            <% if (violations.length > 0) { %>
+                                <% violations.forEach(function(v) { %>
+                                <tr>
+                                    <td><%= v.violation_date %></td>
+                                    <td><%= v.violation_type %></td>
+                                    <td><%= v.sanction || '-' %></td>
+                                </tr>
+                                <% }); %>
+                            <% } else { %>
+                                <tr><td colspan="3" class="text-center text-muted py-3">Tidak ada pelanggaran</td></tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Kasus BK -->
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-header bg-white rounded-4 rounded-bottom-0 py-3">
+                <h6 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Kasus BK</h6>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead><tr><th>Tanggal</th><th>Jenis</th><th>Status</th></tr></thead>
+                        <tbody>
+                            <% if (cases.length > 0) { %>
+                                <% cases.forEach(function(c) { %>
+                                <tr>
+                                    <td><%= c.case_date %></td>
+                                    <td><%= c.case_type %></td>
+                                    <td>
+                                        <% if (c.status === 'open') { %><span class="badge bg-danger">Open</span>
+                                        <% } else if (c.status === 'proses') { %><span class="badge bg-warning">Proses</span>
+                                        <% } else { %><span class="badge bg-success">Selesai</span><% } %>
+                                    </td>
+                                </tr>
+                                <% }); %>
+                            <% } else { %>
+                                <tr><td colspan="3" class="text-center text-muted py-3">Tidak ada kasus BK</td></tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

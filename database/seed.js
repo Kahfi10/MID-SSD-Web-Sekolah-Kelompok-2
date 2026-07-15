@@ -93,20 +93,20 @@ async function seed() {
     // Subjects
     await connection.query("INSERT IGNORE INTO subjects (subject_name, subject_code) VALUES ('Matematika', 'MTK-01'), ('Bahasa Indonesia', 'BIN-01'), ('Bahasa Inggris', 'BIG-01'), ('Fisika', 'FIS-01'), ('Kimia', 'KIM-01'), ('Biologi', 'BIO-01'), ('Sejarah', 'SJR-01'), ('Pendidikan Agama Islam', 'PAI-01'), ('PKN', 'PKN-01'), ('Olahraga', 'OLR-01')");
 
-    // Students
+    // Students (dengan user_id untuk login siswa)
     const students = [
-        ['2025001', 'Ahmad Fauzi', 'L', 'Makassar', '2008-05-12', 'Jl. Veteran No.5', '081234567101', 1, 'aktif'],
-        ['2025002', 'Nurul Hidayah', 'P', 'Makassar', '2008-08-20', 'Jl. Veteran No.10', '081234567102', 1, 'aktif'],
-        ['2025003', 'Rizky Pratama', 'L', 'Gowa', '2008-03-15', 'Jl. Poros No.8', '081234567103', 2, 'aktif'],
-        ['2025004', 'Aisyah Putri', 'P', 'Makassar', '2007-11-30', 'Jl. BTP No.12', '081234567104', 3, 'aktif'],
-        ['2025005', 'Muhammad Arif', 'L', 'Maros', '2007-07-22', 'Jl. Maros No.3', '081234567105', 3, 'aktif'],
-        ['2025006', 'Siti Nurhaliza', 'P', 'Makassar', '2007-01-10', 'Jl. Antang No.7', '081234567106', 4, 'aktif'],
-        ['2025007', 'Fajar Ramadan', 'L', 'Makassar', '2006-09-05', 'Jl. Tamalanrea No.15', '081234567107', 5, 'aktif'],
-        ['2025008', 'Indah Permata', 'P', 'Gowa', '2006-04-18', 'Jl. Sungguminasa No.2', '081234567108', 5, 'aktif']
+        ['2025001', 'Ahmad Fauzi', 'L', 'Makassar', '2008-05-12', 'Jl. Veteran No.5', '081234567101', 1, 8, 'aktif'],
+        ['2025002', 'Nurul Hidayah', 'P', 'Makassar', '2008-08-20', 'Jl. Veteran No.10', '081234567102', 1, 9, 'aktif'],
+        ['2025003', 'Rizky Pratama', 'L', 'Gowa', '2008-03-15', 'Jl. Poros No.8', '081234567103', 2, 10, 'aktif'],
+        ['2025004', 'Aisyah Putri', 'P', 'Makassar', '2007-11-30', 'Jl. BTP No.12', '081234567104', 3, null, 'aktif'],
+        ['2025005', 'Muhammad Arif', 'L', 'Maros', '2007-07-22', 'Jl. Maros No.3', '081234567105', 3, null, 'aktif'],
+        ['2025006', 'Siti Nurhaliza', 'P', 'Makassar', '2007-01-10', 'Jl. Antang No.7', '081234567106', 4, null, 'aktif'],
+        ['2025007', 'Fajar Ramadan', 'L', 'Makassar', '2006-09-05', 'Jl. Tamalanrea No.15', '081234567107', 5, null, 'aktif'],
+        ['2025008', 'Indah Permata', 'P', 'Gowa', '2006-04-18', 'Jl. Sungguminasa No.2', '081234567108', 5, null, 'aktif']
     ];
     for (const s of students) {
         await connection.query(
-            'INSERT IGNORE INTO students (nis, full_name, gender, birth_place, birth_date, address, phone, class_id, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            'INSERT IGNORE INTO students (nis, full_name, gender, birth_place, birth_date, address, phone, class_id, user_id, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
             s
         );
     }

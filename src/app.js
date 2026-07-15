@@ -47,6 +47,7 @@ const jurnalRoutes = require('./modules/jurnal/routes');
 const bkRoutes = require('./modules/bk/routes');
 const absensiRoutes = require('./modules/absensi/routes');
 const profileRoutes = require('./modules/profile/routes');
+const siswaRoutes = require('./modules/siswa/routes');
 
 app.use('/auth', authRoutes);
 app.use('/dashboard', dashboardRoutes);
@@ -56,6 +57,7 @@ app.use('/jurnal', jurnalRoutes);
 app.use('/bk', bkRoutes);
 app.use('/absensi', absensiRoutes);
 app.use('/profile', profileRoutes);
+app.use('/siswa', siswaRoutes);
 
 // Home redirect
 app.get('/', (req, res) => {

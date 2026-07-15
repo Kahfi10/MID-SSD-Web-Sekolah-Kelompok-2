@@ -5,6 +5,11 @@ const { isAuthenticated } = require('../../middleware/auth');
 
 router.get('/', isAuthenticated, async (req, res) => {
     try {
+        // Redirect siswa ke dashboard mereka sendiri
+        if (req.session.user.role_name === 'siswa') {
+            return res.redirect('/siswa/dashboard');
+        }
+
         const [studentCount] = await pool.query('SELECT COUNT(*) as total FROM students WHERE status = ?', ['aktif']);
         const [teacherCount] = await pool.query('SELECT COUNT(*) as total FROM teachers');
         const [journalCount] = await pool.query('SELECT COUNT(*) as total FROM teaching_journals');

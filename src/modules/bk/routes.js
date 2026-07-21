@@ -4,6 +4,23 @@ const pool = require('../../config/database');
 const { isAuthenticated } = require('../../middleware/auth');
 const { allowRoles } = require('../../middleware/rbac');
 
+// ─── Helper: get or auto-create teacher record ───────────────────────────────
+// Guru BK mungkin tidak punya record di tabel teachers (dibuat manual oleh admin).
+// Fungsi ini memastikan teacher record selalu tersedia.
+async function getOrCreateTeacherId(userId, fullName) {
+    const [rows] = await pool.query('SELECT id FROM teachers WHERE user_id = ?', [userId]);
+    if (rows.length > 0) return rows[0].id;
+
+    // Auto-create teacher record dengan NIP unik berdasarkan user_id
+    const nip = `BK-AUTO-${userId}`;
+    const [result] = await pool.query(
+        'INSERT INTO teachers (user_id, nip, full_name) VALUES (?, ?, ?)',
+        [userId, nip, fullName || 'Guru BK']
+    );
+    return result.insertId;
+}
+
+
 // Dashboard BK
 router.get('/', isAuthenticated, allowRoles('guru_bk', 'admin', 'kepala_sekolah'), async (req, res) => {
     try {
@@ -111,12 +128,15 @@ router.get('/', isAuthenticated, allowRoles('guru_bk', 'admin', 'kepala_sekolah'
 router.post('/cases/store', isAuthenticated, allowRoles('guru_bk', 'admin'), async (req, res) => {
     try {
         const { student_id, case_date, case_type, description, teacher_id: bodyTeacherId } = req.body;
-        const [teacher] = await pool.query('SELECT id FROM teachers WHERE user_id = ?', [req.session.user.id]);
-        const teacherId = teacher.length > 0 ? teacher[0].id : bodyTeacherId;
 
-        if (!teacherId) {
-            req.flash('error', 'Guru BK tidak ditemukan. Pastikan akun ini terdaftar sebagai guru.');
-            return res.redirect('/bk');
+        let teacherId;
+        if (req.session.user.role_name === 'admin' && bodyTeacherId) {
+            teacherId = bodyTeacherId;
+        } else {
+            teacherId = await getOrCreateTeacherId(
+                req.session.user.id,
+                req.session.user.full_name
+            );
         }
 
         await pool.query(
@@ -133,7 +153,7 @@ router.post('/cases/store', isAuthenticated, allowRoles('guru_bk', 'admin'), asy
         res.redirect('/bk');
     } catch (error) {
         console.error(error);
-        req.flash('error', 'Gagal mencatat kasus');
+        req.flash('error', 'Gagal mencatat kasus: ' + error.message);
         res.redirect('/bk');
     }
 });
@@ -142,12 +162,15 @@ router.post('/cases/store', isAuthenticated, allowRoles('guru_bk', 'admin'), asy
 router.post('/counseling/store', isAuthenticated, allowRoles('guru_bk', 'admin'), async (req, res) => {
     try {
         const { student_id, counseling_date, topic, note, follow_up, teacher_id: bodyTeacherId } = req.body;
-        const [teacher] = await pool.query('SELECT id FROM teachers WHERE user_id = ?', [req.session.user.id]);
-        const teacherId = teacher.length > 0 ? teacher[0].id : bodyTeacherId;
 
-        if (!teacherId) {
-            req.flash('error', 'Guru BK tidak ditemukan. Pastikan akun ini terdaftar sebagai guru.');
-            return res.redirect('/bk');
+        let teacherId;
+        if (req.session.user.role_name === 'admin' && bodyTeacherId) {
+            teacherId = bodyTeacherId;
+        } else {
+            teacherId = await getOrCreateTeacherId(
+                req.session.user.id,
+                req.session.user.full_name
+            );
         }
 
         await pool.query(
@@ -155,11 +178,16 @@ router.post('/counseling/store', isAuthenticated, allowRoles('guru_bk', 'admin')
             [student_id, teacherId, counseling_date, topic, note, follow_up]
         );
 
+        await pool.query(
+            'INSERT INTO activity_logs (user_id, action, description, ip_address) VALUES (?, ?, ?, ?)',
+            [req.session.user.id, 'create_counseling', `Mencatat konseling untuk siswa ID ${student_id}`, req.ip]
+        );
+
         req.flash('success', 'Catatan konseling berhasil disimpan');
         res.redirect('/bk');
     } catch (error) {
         console.error(error);
-        req.flash('error', 'Gagal menyimpan catatan');
+        req.flash('error', 'Gagal menyimpan catatan: ' + error.message);
         res.redirect('/bk');
     }
 });
@@ -168,12 +196,15 @@ router.post('/counseling/store', isAuthenticated, allowRoles('guru_bk', 'admin')
 router.post('/violations/store', isAuthenticated, allowRoles('guru_bk', 'admin'), async (req, res) => {
     try {
         const { student_id, violation_date, violation_type, description, sanction, teacher_id: bodyTeacherId } = req.body;
-        const [teacher] = await pool.query('SELECT id FROM teachers WHERE user_id = ?', [req.session.user.id]);
-        const teacherId = teacher.length > 0 ? teacher[0].id : bodyTeacherId;
 
-        if (!teacherId) {
-            req.flash('error', 'Guru BK tidak ditemukan. Pastikan akun ini terdaftar sebagai guru.');
-            return res.redirect('/bk');
+        let teacherId;
+        if (req.session.user.role_name === 'admin' && bodyTeacherId) {
+            teacherId = bodyTeacherId;
+        } else {
+            teacherId = await getOrCreateTeacherId(
+                req.session.user.id,
+                req.session.user.full_name
+            );
         }
 
         await pool.query(
@@ -181,11 +212,16 @@ router.post('/violations/store', isAuthenticated, allowRoles('guru_bk', 'admin')
             [student_id, teacherId, violation_date, violation_type, description, sanction]
         );
 
+        await pool.query(
+            'INSERT INTO activity_logs (user_id, action, description, ip_address) VALUES (?, ?, ?, ?)',
+            [req.session.user.id, 'create_violation', `Mencatat pelanggaran untuk siswa ID ${student_id}`, req.ip]
+        );
+
         req.flash('success', 'Pelanggaran berhasil dicatat');
         res.redirect('/bk');
     } catch (error) {
         console.error(error);
-        req.flash('error', 'Gagal mencatat pelanggaran');
+        req.flash('error', 'Gagal mencatat pelanggaran: ' + error.message);
         res.redirect('/bk');
     }
 });

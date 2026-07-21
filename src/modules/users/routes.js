@@ -44,6 +44,20 @@ router.get('/', isAuthenticated, allowRoles('admin'), async (req, res) => {
 router.post('/store', isAuthenticated, allowRoles('admin'), async (req, res) => {
     try {
         const { username, email, password, full_name, role_id } = req.body;
+
+        // Cek duplikat username
+        const [existUsername] = await pool.query('SELECT id FROM users WHERE username = ?', [username]);
+        if (existUsername.length > 0) {
+            req.flash('error', `Username "${username}" sudah digunakan`);
+            return res.redirect('/users');
+        }
+        // Cek duplikat email
+        const [existEmail] = await pool.query('SELECT id FROM users WHERE email = ?', [email]);
+        if (existEmail.length > 0) {
+            req.flash('error', `Email "${email}" sudah terdaftar`);
+            return res.redirect('/users');
+        }
+
         const hashedPassword = await bcrypt.hash(password, 10);
 
         await pool.query(
@@ -106,6 +120,10 @@ router.post('/update/:id', isAuthenticated, allowRoles('admin'), async (req, res
 
 router.post('/delete/:id', isAuthenticated, allowRoles('admin'), async (req, res) => {
     try {
+        if (parseInt(req.params.id) === req.session.user.id) {
+            req.flash('error', 'Tidak dapat menghapus akun sendiri');
+            return res.redirect('/users');
+        }
         await pool.query('DELETE FROM users WHERE id = ?', [req.params.id]);
         await pool.query(
             'INSERT INTO activity_logs (user_id, action, description, ip_address) VALUES (?, ?, ?, ?)',

@@ -74,7 +74,7 @@ router.get('/', isAuthenticated, async (req, res) => {
 
     } catch (error) {
         console.error(error);
-        req.flash('error', 'Terjadi kesalahan');
+        req.flash('error', 'Terjadi kesalahan saat memuat dashboard');
         res.redirect('/auth/login');
     }
 });

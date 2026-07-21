@@ -69,6 +69,22 @@ router.post('/change-password', isAuthenticated, async (req, res) => {
 router.post('/update', isAuthenticated, async (req, res) => {
     try {
         const { full_name, email } = req.body;
+
+        if (!full_name || !email) {
+            req.flash('error', 'Nama dan email tidak boleh kosong');
+            return res.redirect('/profile');
+        }
+
+        // Cek email sudah dipakai user lain
+        const [existEmail] = await pool.query(
+            'SELECT id FROM users WHERE email = ? AND id != ?',
+            [email, req.session.user.id]
+        );
+        if (existEmail.length > 0) {
+            req.flash('error', 'Email sudah digunakan oleh pengguna lain');
+            return res.redirect('/profile');
+        }
+
         await pool.query(
             'UPDATE users SET full_name = ?, email = ? WHERE id = ?',
             [full_name, email, req.session.user.id]

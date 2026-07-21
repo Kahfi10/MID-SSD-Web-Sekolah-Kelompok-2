@@ -8,7 +8,6 @@ const { allowRoles } = require('../../middleware/rbac');
 router.get('/', isAuthenticated, allowRoles('guru_bk', 'admin', 'kepala_sekolah'), async (req, res) => {
     try {
         const { search } = req.query;
-        const [bkTeacher] = await pool.query('SELECT id FROM teachers WHERE user_id = ?', [req.session.user.id]);
 
         let page = parseInt(req.query.page) || 1;
         let limit = 10;
@@ -85,6 +84,7 @@ router.get('/', isAuthenticated, allowRoles('guru_bk', 'admin', 'kepala_sekolah'
         );
 
         const [students] = await pool.query('SELECT * FROM students WHERE status = ?', ['aktif']);
+        const [teachers] = await pool.query('SELECT t.id, t.full_name FROM teachers t ORDER BY t.full_name');
 
         res.render('bk/index', {
             title: 'Bimbingan Konseling',
@@ -93,7 +93,7 @@ router.get('/', isAuthenticated, allowRoles('guru_bk', 'admin', 'kepala_sekolah'
             violations,
             achievements,
             students,
-            bkTeacher: bkTeacher.length > 0 ? bkTeacher[0] : null,
+            teachers,
             search,
             page,
             totalPages,
@@ -110,9 +110,14 @@ router.get('/', isAuthenticated, allowRoles('guru_bk', 'admin', 'kepala_sekolah'
 // Store case
 router.post('/cases/store', isAuthenticated, allowRoles('guru_bk', 'admin'), async (req, res) => {
     try {
-        const { student_id, case_date, case_type, description } = req.body;
+        const { student_id, case_date, case_type, description, teacher_id: bodyTeacherId } = req.body;
         const [teacher] = await pool.query('SELECT id FROM teachers WHERE user_id = ?', [req.session.user.id]);
-        const teacherId = teacher.length > 0 ? teacher[0].id : req.body.teacher_id;
+        const teacherId = teacher.length > 0 ? teacher[0].id : bodyTeacherId;
+
+        if (!teacherId) {
+            req.flash('error', 'Guru BK tidak ditemukan. Pastikan akun ini terdaftar sebagai guru.');
+            return res.redirect('/bk');
+        }
 
         await pool.query(
             'INSERT INTO bk_cases (student_id, teacher_id, case_date, case_type, description) VALUES (?, ?, ?, ?, ?)',
@@ -136,9 +141,14 @@ router.post('/cases/store', isAuthenticated, allowRoles('guru_bk', 'admin'), asy
 // Store counseling note
 router.post('/counseling/store', isAuthenticated, allowRoles('guru_bk', 'admin'), async (req, res) => {
     try {
-        const { student_id, counseling_date, topic, note, follow_up } = req.body;
+        const { student_id, counseling_date, topic, note, follow_up, teacher_id: bodyTeacherId } = req.body;
         const [teacher] = await pool.query('SELECT id FROM teachers WHERE user_id = ?', [req.session.user.id]);
-        const teacherId = teacher.length > 0 ? teacher[0].id : req.body.teacher_id;
+        const teacherId = teacher.length > 0 ? teacher[0].id : bodyTeacherId;
+
+        if (!teacherId) {
+            req.flash('error', 'Guru BK tidak ditemukan. Pastikan akun ini terdaftar sebagai guru.');
+            return res.redirect('/bk');
+        }
 
         await pool.query(
             'INSERT INTO bk_counseling_notes (student_id, teacher_id, counseling_date, topic, note, follow_up) VALUES (?, ?, ?, ?, ?, ?)',
@@ -157,9 +167,14 @@ router.post('/counseling/store', isAuthenticated, allowRoles('guru_bk', 'admin')
 // Store violation
 router.post('/violations/store', isAuthenticated, allowRoles('guru_bk', 'admin'), async (req, res) => {
     try {
-        const { student_id, violation_date, violation_type, description, sanction } = req.body;
+        const { student_id, violation_date, violation_type, description, sanction, teacher_id: bodyTeacherId } = req.body;
         const [teacher] = await pool.query('SELECT id FROM teachers WHERE user_id = ?', [req.session.user.id]);
-        const teacherId = teacher.length > 0 ? teacher[0].id : req.body.teacher_id;
+        const teacherId = teacher.length > 0 ? teacher[0].id : bodyTeacherId;
+
+        if (!teacherId) {
+            req.flash('error', 'Guru BK tidak ditemukan. Pastikan akun ini terdaftar sebagai guru.');
+            return res.redirect('/bk');
+        }
 
         await pool.query(
             'INSERT INTO student_violations (student_id, teacher_id, violation_date, violation_type, description, sanction) VALUES (?, ?, ?, ?, ?, ?)',
@@ -208,6 +223,74 @@ router.post('/cases/update-status/:id', isAuthenticated, allowRoles('guru_bk', '
     }
 });
 
+// Delete case
+router.post('/cases/delete/:id', isAuthenticated, allowRoles('guru_bk', 'admin'), async (req, res) => {
+    try {
+        await pool.query('DELETE FROM bk_cases WHERE id = ?', [req.params.id]);
+        await pool.query(
+            'INSERT INTO activity_logs (user_id, action, description, ip_address) VALUES (?, ?, ?, ?)',
+            [req.session.user.id, 'delete_case', `Menghapus kasus BK ID ${req.params.id}`, req.ip]
+        );
+        req.flash('success', 'Kasus berhasil dihapus');
+        res.redirect('/bk');
+    } catch (error) {
+        console.error(error);
+        req.flash('error', 'Gagal menghapus kasus');
+        res.redirect('/bk');
+    }
+});
+
+// Delete counseling
+router.post('/counseling/delete/:id', isAuthenticated, allowRoles('guru_bk', 'admin'), async (req, res) => {
+    try {
+        await pool.query('DELETE FROM bk_counseling_notes WHERE id = ?', [req.params.id]);
+        await pool.query(
+            'INSERT INTO activity_logs (user_id, action, description, ip_address) VALUES (?, ?, ?, ?)',
+            [req.session.user.id, 'delete_counseling', `Menghapus catatan konseling ID ${req.params.id}`, req.ip]
+        );
+        req.flash('success', 'Catatan konseling berhasil dihapus');
+        res.redirect('/bk');
+    } catch (error) {
+        console.error(error);
+        req.flash('error', 'Gagal menghapus catatan');
+        res.redirect('/bk');
+    }
+});
+
+// Delete violation
+router.post('/violations/delete/:id', isAuthenticated, allowRoles('guru_bk', 'admin'), async (req, res) => {
+    try {
+        await pool.query('DELETE FROM student_violations WHERE id = ?', [req.params.id]);
+        await pool.query(
+            'INSERT INTO activity_logs (user_id, action, description, ip_address) VALUES (?, ?, ?, ?)',
+            [req.session.user.id, 'delete_violation', `Menghapus pelanggaran ID ${req.params.id}`, req.ip]
+        );
+        req.flash('success', 'Pelanggaran berhasil dihapus');
+        res.redirect('/bk');
+    } catch (error) {
+        console.error(error);
+        req.flash('error', 'Gagal menghapus pelanggaran');
+        res.redirect('/bk');
+    }
+});
+
+// Delete achievement
+router.post('/achievements/delete/:id', isAuthenticated, allowRoles('guru_bk', 'admin'), async (req, res) => {
+    try {
+        await pool.query('DELETE FROM student_achievements WHERE id = ?', [req.params.id]);
+        await pool.query(
+            'INSERT INTO activity_logs (user_id, action, description, ip_address) VALUES (?, ?, ?, ?)',
+            [req.session.user.id, 'delete_achievement', `Menghapus prestasi ID ${req.params.id}`, req.ip]
+        );
+        req.flash('success', 'Prestasi berhasil dihapus');
+        res.redirect('/bk');
+    } catch (error) {
+        console.error(error);
+        req.flash('error', 'Gagal menghapus prestasi');
+        res.redirect('/bk');
+    }
+});
+
 // Rekap BK
 router.get('/rekap', isAuthenticated, allowRoles('guru_bk', 'admin', 'kepala_sekolah'), async (req, res) => {
     try {
@@ -241,7 +324,7 @@ router.get('/rekap', isAuthenticated, allowRoles('guru_bk', 'admin', 'kepala_sek
             `SELECT bc.case_type, COUNT(*) as total
              FROM bk_cases bc
              JOIN students s ON bc.student_id = s.id
-             ${where.replace(/bc\./g, 'bc.')}
+             ${where}
              GROUP BY bc.case_type ORDER BY total DESC`, params
         );
 

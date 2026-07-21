@@ -68,6 +68,16 @@ app.get('/', (req, res) => {
     }
 });
 
+// 404 handler
+app.use((req, res) => {
+    res.status(404);
+    if (req.session.user) {
+        req.flash('error', `Halaman "${req.path}" tidak ditemukan`);
+        return res.redirect('/dashboard');
+    }
+    res.redirect('/auth/login');
+});
+
 app.listen(PORT, () => {
     console.log(`Server berjalan di http://localhost:${PORT}`);
 });

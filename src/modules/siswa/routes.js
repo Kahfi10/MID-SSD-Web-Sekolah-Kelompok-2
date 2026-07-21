@@ -2,8 +2,9 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../../config/database');
 const { isAuthenticated } = require('../../middleware/auth');
+const { allowRoles } = require('../../middleware/rbac');
 
-router.get('/dashboard', isAuthenticated, async (req, res) => {
+router.get('/dashboard', isAuthenticated, allowRoles('siswa'), async (req, res) => {
     try {
         const userId = req.session.user.id;
 
@@ -18,8 +19,8 @@ router.get('/dashboard', isAuthenticated, async (req, res) => {
         );
 
         if (studentRows.length === 0) {
-            req.flash('error', 'Data siswa tidak ditemukan');
-            return res.redirect('/auth/login');
+            req.flash('error', 'Data siswa tidak ditemukan untuk akun ini');
+            return res.redirect('/dashboard');
         }
 
         const student = studentRows[0];

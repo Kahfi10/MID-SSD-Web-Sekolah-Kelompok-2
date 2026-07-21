@@ -114,6 +114,10 @@ router.post('/update/:id', isAuthenticated, allowRoles('admin'), async (req, res
 router.post('/delete/:id', isAuthenticated, allowRoles('admin'), async (req, res) => {
     try {
         await pool.query('DELETE FROM students WHERE id = ?', [req.params.id]);
+        await pool.query(
+            'INSERT INTO activity_logs (user_id, action, description, ip_address) VALUES (?, ?, ?, ?)',
+            [req.session.user.id, 'delete_student', `Menghapus siswa ID ${req.params.id}`, req.ip]
+        );
         req.flash('success', 'Data siswa berhasil dihapus');
         res.redirect('/kesiswaan');
     } catch (error) {

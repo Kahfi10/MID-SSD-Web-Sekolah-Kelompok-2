@@ -27,7 +27,7 @@ router.get('/', isAuthenticated, allowRoles('admin', 'kepala_sekolah', 'guru', '
              FROM attendances a
              JOIN students s ON a.student_id = s.id
              JOIN classes c ON a.class_id = c.id
-             JOIN users u ON a.created_by = u.id
+             LEFT JOIN users u ON a.created_by = u.id
              ${where}
              ORDER BY a.attendance_date DESC, c.class_name, s.full_name
              LIMIT ? OFFSET ?`, [...params, limit, offset]
